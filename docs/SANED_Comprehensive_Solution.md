@@ -9,8 +9,8 @@
 _Audience: C-suite, Board Members, Ministry Leadership_
 
 **Strategic Pillars:**
-- **Zero-Trust Security:** Micro-segmented perimeters governed by Fortinet & Securado, enforcing identity-level authorization over all service interactions.
-- **Data Supremacy:** Transition from siloed RDBMS to an integrated Delta Lake (Lakehouse) providing immutable, versioned, and ML-ready single source of truth.
+- **Absolute Zero-Trust Security:** Microsegmented perimeters governed by Fortinet & Securado WAAP layers, enforcing identity-level authorization over all service interactions using CIAM (for Citizens) and IDAM (for Intranet / Agents).
+- **Data Supremacy:** Transition from siloed RDBMS to an integrated Delta Lake (Lakehouse) providing immutable, versioned, and ML-ready single source of truth, overseen by strict Database Activity Monitoring (DAM).
 - **Intelligent Orchestration:** "Agentic Services" layer overriding rigid monolithic logic with dynamic, personalized AI workers parsing citizen life events (e.g. Birth, Marriage, Retirement).
 - **Scale:** Architecture natively accommodates an active peak load of 4.5 million interactions monthly, backed by NVIDIA NIM clustered inference servers.
 
@@ -23,12 +23,12 @@ _Audience: C-suite, Board Members, Ministry Leadership_
 ### Session 2: Infrastructure & Security Foundation
 _Audience: Network Engineers, SecOps, DevOps, IT Leads_
 
-The SANED ecosystem is built on a highly fortified, multi-availability zone Virtual Private Cloud (VPC-SANED-PROD) emphasizing strict traffic segregation, deep packet inspection, and horizontal scaling.
+The SANED ecosystem is built on a highly fortified, multi-availability zone Virtual Private Cloud (VPC-SANED-PROD) emphasizing strict ZTNA microsegmentation, deep packet inspection, and horizontal scaling. Cryptographic integrity is bound to physical Hardware Security Modules (HSM).
 
 **Core Topologies:**
-1. **DMZ (Perimeter):** Cloudflare CDN / WAF feeds to FortiGate Gen-7 Firewalls.
-2. **App Tier (Internal VPC):** Node.js/Next.js pods running on standard Kubernetes (K8s) Control Plane. Microservices managed by Istio Service Mesh.
-3. **Mgmt Tier (SOC):** Splunk SIEM logger, Keycloak Identity Manager, Jump Hosts via Bastion.
+1. **DMZ (Perimeter):** Cloudflare CDN feeds into a Next-Gen Enterprise Web Application and API Protection (WAAP) and FortiGate Gen-7 Firewalls.
+2. **App Tier (Internal VPC):** Node.js/Next.js pods running on standard Kubernetes (K8s) Control Plane. Microservices managed by Istio Service Mesh, fully microsegmented by namespace.
+3. **Mgmt Tier (SOC):** Splunk SIEM logger, Keycloak IDAM Manager, Jump Hosts via Bastion.
 
 **Reference Architecture:**
 - [SANED IT Infrastructure Blueprint](https://ktkdaskrishna.github.io/SANED-Architecture/diagrams/10-saned-infrastructure-block-diagram.html)
