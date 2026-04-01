@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HIMAYA — National Social Protection Intelligence Platform</title>
+<title>SANED — National Social Protection Intelligence Platform | Securado</title>
 <meta name="description" content="CXO Architecture: National-scale Social Protection Intelligence Platform for the Sultanate of Oman">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -266,6 +266,32 @@
     .flow-steps { grid-template-columns: 1fr 1fr; }
     .layer { grid-template-columns: 1fr; }
   }
+  /* ───────── SECURADO BRANDING ───────── */
+  .securado-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; margin-bottom: 8px;
+  }
+  .securado-logo-img { height: 32px; opacity: 0.9;  }
+  .securado-conf {
+    font-size: 9px; color: var(--text-muted); letter-spacing: 1.5px;
+    text-transform: uppercase; font-weight: 600;
+  }
+  .securado-watermark {
+    position: fixed; bottom: 20px; right: 24px; z-index: 100;
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(10,14,26,0.85); border: 1px solid var(--border-dim);
+    padding: 8px 16px; border-radius: 20px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .securado-watermark img { height: 18px; opacity: 0.7;  }
+  .securado-watermark span { font-size: 9px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .portal-footer {
+    margin-top: 40px; padding: 24px 0; border-top: 1px solid var(--border-dim);
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--text-muted); font-size: 10px;
+  }
+  .portal-footer a { color: var(--teal); text-decoration: none; }
+  .portal-footer img { height: 20px; opacity: 0.6; }
 </style>
 </head>
 <body>
@@ -273,10 +299,16 @@
 
 <div class="page">
 
+  <!-- ═══════════ SECURADO HEADER ═══════════ -->
+  <div class="securado-header">
+    <img src="../assets/securado-logo-reverse.png" alt="Securado" class="securado-logo-img">
+    <span class="securado-conf">Confidential · Architecture Document</span>
+  </div>
+
   <!-- ═══════════ MASTHEAD ═══════════ -->
   <header class="masthead">
     <div class="masthead-left">
-      <h1>HIMAYA <span class="ar">حماية</span></h1>
+      <h1>SANED <span class="ar">سانِد</span></h1>
       <p class="sub">National Social Protection Intelligence Platform — Unifying beneficiary data, ML-driven segmentation, and agentic AI to power equitable grant delivery, CSR allocation, and welfare facility distribution across the Sultanate of Oman.</p>
     </div>
     <div class="masthead-right">
@@ -646,6 +678,19 @@
     </div>
   </div>
 
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="portal-footer">
+    <div>SANED سانِد · Sultanate of Oman · Social Protection Intelligence Platform · Confidential</div>
+    <div style="display:flex;align-items:center;gap:8px;">Powered by <img src="../assets/securado-logo-reverse.png" alt="Securado"> · CoreX Platform v1.0</div>
+  </footer>
+
 </div><!-- /page -->
+
+<!-- ═══════════ SECURADO WATERMARK ═══════════ -->
+<div class="securado-watermark">
+  <img src="../assets/securado-logo-reverse.png" alt="Securado">
+  <span>Securado · Protected</span>
+</div>
+
 </body>
 </html>

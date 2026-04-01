@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SANED — Infrastructure Component Architecture</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-void: #04060c;
+            --bg-base: #0a0e1a;
+            --bg-zone: #111828;
+            --bg-node: #1a2235;
+
+            --border-dim: rgba(255,255,255,0.06);
+            --border-subtle: rgba(255,255,255,0.12);
+            --border-accent: rgba(255,255,255,0.2);
+
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+
+            /* IT Blueprint Palette */
+            --inet-blue: #3b82f6;
+            --sec-red: #ef4444;
+            --app-teal: #14b8a6;
+            --data-amber: #f59e0b;
+            --mgmt-violet: #8b5cf6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-void);
+            color: var(--text-primary);
+            padding: 40px;
+        }
+
+        .canvas-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .header {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .header-title { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+        .header-sub { font-size: 14px; color: var(--text-secondary); margin-top: 5px; font-family: 'JetBrains Mono', monospace; }
+
+        .logo-box {
+            display: flex; align-items: center; gap: 10px;
+        }
+        .logo-box img {
+            height: 32px;
+        }
+        .logo-box span { font-size: 11px; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; color: var(--text-secondary); }
+
+        /* Infrastructure Grid Map */
+        .vpc-container {
+            background: var(--bg-base);
+            border: 2px dashed var(--border-subtle);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .vpc-label {
+            position: absolute;
+            top: -12px;
+            left: 30px;
+            background: var(--bg-void);
+            padding: 0 15px;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-secondary);
+            font-weight: 700;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+        }
+
+        .row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .row-center { justify-content: center; }
+
+        /* Security Groups / Zones */
+        .zone {
+            flex: 1;
+            background: var(--bg-zone);
+            border: 1px solid var(--border-dim);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            min-width: 280px;
+        }
+
+        .zone-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-dim);
+            padding-bottom: 10px;
+        }
+
+        .zone-icon { font-size: 18px; }
+        .zone-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+
+        /* Colored Borders for Zones */
+        .z-ext { border-top: 3px solid var(--inet-blue); }
+        .z-sec { border-top: 3px solid var(--sec-red); }
+        .z-app { border-top: 3px solid var(--app-teal); }
+        .z-data { border-top: 3px solid var(--data-amber); }
+        .z-mgmt { border-top: 3px solid var(--mgmt-violet); }
+
+        /* IT Nodes */
+        .node-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+        }
+
+        .node {
+            background: var(--bg-node);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .node-icon { font-size: 20px; }
+        .node-name { font-size: 11px; font-weight: 600; }
+        .node-meta { font-size: 9px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
+
+        /* Flow Connectors */
+        .vertical-flow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 0;
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+        
+        .horizontal-flow {
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            color: var(--text-secondary);
+        }
+
+        .line-fw { color: var(--sec-red); }
+        .line-app { color: var(--app-teal); }
+
+        /* Watermark */
+        .watermark {
+            display: flex; align-items: center; justify-content: center; opacity: 0.5;
+            position: fixed; bottom: 20px; width: 100%; pointer-events: none;
+            gap: 8px; left: 0; right: 0;
+        }
+        .watermark img { height: 16px; }
+        .watermark span { font-size: 10px; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; }
+
+    </style>
+</head>
+<body>
+    <div class="canvas-bg"></div>
+    
+    <div class="header">
+        <div>
+            <div class="header-title">SANED / IT Infrastructure Block Diagram</div>
+            <div class="header-sub">VPC Logical Topology · Fortified Enterprise Pattern · Active/Active</div>
+        </div>
+        <div class="logo-box">
+            <img src="../assets/securado-logo-reverse.png" alt="Securado">
+            <span>Enterprise Architecture</span>
+        </div>
+    </div>
+
+    <!-- EXTERNAL ACCESS -->
+    <div class="row row-center">
+        <div class="zone z-ext" style="max-width: 600px;">
+            <div class="zone-header">
+                <span class="zone-icon">🌐</span>
+                <span class="zone-title">External Perimeter / CDN</span>
+            </div>
+            <div class="node-grid">
+                <div class="node">
+                    <span class="node-icon">📱</span>
+                    <span class="node-name">Citizen Portals</span>
+                    <span class="node-meta">Public Traffic</span>
+                </div>
+                <div class="node">
+                    <span class="node-icon">🏢</span>
+                    <span class="node-name">MOH Intranet</span>
+                    <span class="node-meta">Gov Network</span>
+                </div>
+                <div class="node">
+                    <span class="node-icon">🛡️</span>
+                    <span class="node-name">CDN & Anti-DDoS</span>
+                    <span class="node-meta">Cloudflare/Akamai</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="vertical-flow line-fw">⬇ HTTPS & API Traffic ⬇</div>
+
+    <!-- VPC TIER -->
+    <div class="vpc-container">
+        <div class="vpc-label">VPC-SANED-PROD [10.100.0.0/16]</div>
+        
+        <!-- SECURITY / DMZ TIER -->
+        <div class="row">
+            <div class="zone z-sec">
+                <div class="zone-header">
+                    <span class="zone-icon">🚨</span>
+                    <span class="zone-title">Public Subnet (DMZ)</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node">
+                        <span class="node-icon">🧱</span>
+                        <span class="node-name">Next-Gen Firewall</span>
+                        <span class="node-meta">L7 Inspection</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">🔍</span>
+                        <span class="node-name">WAF App Sec</span>
+                        <span class="node-meta">OWASP Top 10</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">⚖️</span>
+                        <span class="node-name">External ALB</span>
+                        <span class="node-meta">SSL Termination</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">🔑</span>
+                        <span class="node-name">API Gateway</span>
+                        <span class="node-meta">Kong / Apigee</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="vertical-flow line-fw">⬇ Zero-Trust Authenticated Traffic ⬇</div>
+
+        <!-- APP & MGMT TIERS (parallel) -->
+        <div class="row">
+            <div class="zone z-app" style="flex: 3;">
+                <div class="zone-header">
+                    <span class="zone-icon">⚙️</span>
+                    <span class="zone-title">Private Subnet (App & CoreX Engine)</span>
+                </div>
+                <div class="node-grid" style="grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));">
+                    <div class="node">
+                        <span class="node-icon">🚢</span>
+                        <span class="node-name">Kubernetes Control</span>
+                        <span class="node-meta">K8s Master</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">📦</span>
+                        <span class="node-name">E-Service Pods</span>
+                        <span class="node-meta">Node.js/Next.js</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">🧠</span>
+                        <span class="node-name">MLOps Inference</span>
+                        <span class="node-meta">NVIDIA NIM/Triton</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">🤖</span>
+                        <span class="node-name">Agent Workers</span>
+                        <span class="node-meta">Python Backend</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">🔄</span>
+                        <span class="node-name">Internal ALB</span>
+                        <span class="node-meta">Service Mesh</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">⚡</span>
+                        <span class="node-name">Spark Cluster</span>
+                        <span class="node-meta">ETL Workers</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="horizontal-flow line-app">↔️</div>
+
+            <div class="zone z-mgmt" style="flex: 1;">
+                <div class="zone-header">
+                    <span class="zone-icon">🛠️</span>
+                    <span class="zone-title">Mgmt / SOC</span>
+                </div>
+                <div class="node-grid" style="grid-template-columns: 1fr;">
+                    <div class="node">
+                        <span class="node-name">SIEM Logger</span>
+                        <span class="node-meta">Splunk / Sentinel</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-name">Jump Host / Bastion</span>
+                        <span class="node-meta">MFA Secured</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-name">IAM / SSO</span>
+                        <span class="node-meta">Keycloak</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="vertical-flow line-app">⬇ Internal VNet Peering ⬇</div>
+
+        <!-- DATA TIER -->
+        <div class="row">
+            <div class="zone z-data">
+                <div class="zone-header">
+                    <span class="zone-icon">🗄️</span>
+                    <span class="zone-title">Secure Subnet (Data Lakehouse & Repositories)</span>
+                </div>
+                <div class="node-grid">
+                    <div class="node">
+                        <span class="node-icon">🐘</span>
+                        <span class="node-name">Primary RDBMS</span>
+                        <span class="node-meta">PostgreSQL HA</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">📝</span>
+                        <span class="node-name">NoSQL Store</span>
+                        <span class="node-meta">MongoDB Cluster</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">🗃️</span>
+                        <span class="node-name">Data Lake (S3)</span>
+                        <span class="node-meta">Delta Lake / MinIO</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">🚄</span>
+                        <span class="node-name">In-Memory Cache</span>
+                        <span class="node-meta">Redis Sentinel</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">🔐</span>
+                        <span class="node-name">Vault Server</span>
+                        <span class="node-meta">HashiCorp Vault</span>
+                    </div>
+                    <div class="node">
+                        <span class="node-icon">📚</span>
+                        <span class="node-name">Vector DB</span>
+                        <span class="node-meta">Qdrant/Milvus</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- End VPC -->
+
+    <div class="watermark">
+        <img src="../assets/securado-logo.png" alt="Securado">
+        <span>Protected Infrastructure Design</span>
+    </div>
+</body>
+</html>
