@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASI — CXO Comprehensive Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #050a15;
+    --bg-panel: #0d1527;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    
+    /* Brand Colors */
+    --accent-gold: #cda85f;
+    --accent-teal: #14b8a6;
+    --accent-blue: #3b82f6;
+    --accent-purple: #8b5cf6;
+    --accent-rose: #f43f5e;
+    
+    --glow-gold: rgba(205, 168, 95, 0.15);
+    --glow-teal: rgba(20, 184, 166, 0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  /* Executive Grid Background */
+  .bg-grid {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 0;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+  }
+  
+  .bg-glow {
+    position: fixed; top: -20vh; left: -10vw; width: 60vw; height: 60vh;
+    background: radial-gradient(circle, var(--glow-teal) 0%, transparent 70%);
+    filter: blur(80px); z-index: 0; pointer-events: none;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 1600px; margin: 0 auto; padding: 40px;
+  }
+
+  /* Header Section */
+  .header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 24px; margin-bottom: 40px;
+  }
+  .header-left h1 {
+    font-size: 36px; font-weight: 800; letter-spacing: -1px;
+    background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .header-left p { color: var(--accent-gold); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; }
+  
+  .header-right { display: flex; gap: 24px; }
+  .kpi-box {
+    background: var(--bg-panel); border: 1px solid var(--border-color);
+    padding: 16px 24px; border-radius: 12px;
+    text-align: right; min-width: 160px;
+  }
+  .kpi-val { font-size: 28px; font-weight: 800; color: var(--text-main); font-family: 'JetBrains Mono', monospace; }
+  .kpi-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* Main Layout */
+  .dashboard {
+    display: grid; grid-template-columns: 280px 1fr 320px; gap: 24px;
+    align-items: start;
+  }
+
+  .panel {
+    background: var(--bg-panel); border: 1px solid var(--border-color);
+    border-radius: 16px; padding: 24px;
+    position: relative; overflow: hidden;
+  }
+
+  .panel-title {
+    font-size: 14px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+  }
+  .panel-title i { color: var(--accent-teal); font-style: normal; font-size: 16px; }
+
+  /* Left Column: Data Sources & Scope */
+  .source-list { display: flex; flex-direction: column; gap: 12px; }
+  .source-item {
+    padding: 12px 16px; background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;
+    border-left: 3px solid var(--accent-blue);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .source-item span { font-size: 13px; font-weight: 500; }
+  .source-item .badge { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); padding: 2px 6px; border-radius: 4px; }
+
+  /* Center Column: Architecture Stack */
+  .stack-container { display: flex; flex-direction: column; gap: 8px; }
+  
+  .stack-layer {
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid var(--border-color); border-radius: 12px;
+    padding: 20px 24px; position: relative;
+    display: grid; grid-template-columns: 160px 1fr; gap: 24px; align-items: center;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .stack-layer:hover { transform: translateX(5px); border-color: rgba(255,255,255,0.2); }
+  
+  .layer-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .layer-info p { font-size: 12px; color: var(--text-muted); }
+  
+  .layer-components { display: flex; flex-wrap: wrap; gap: 10px; }
+  .comp-tag {
+    background: rgba(0,0,0,0.4); border: 1px solid var(--border-color);
+    padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Specific Layer Accents */
+  .layer-ai { border-left: 4px solid var(--accent-gold); }
+  .layer-ai h3 { color: var(--accent-gold); }
+  .layer-analytics { border-left: 4px solid var(--accent-teal); }
+  .layer-analytics h3 { color: var(--accent-teal); }
+  .layer-ml { border-left: 4px solid var(--accent-purple); }
+  .layer-ml h3 { color: var(--accent-purple); }
+  .layer-data { border-left: 4px solid var(--accent-blue); }
+  .layer-data h3 { color: var(--accent-blue); }
+
+  /* Right Column: Security & Value */
+  .sec-list { display: flex; flex-direction: column; gap: 16px; }
+  .sec-item { display: flex; gap: 12px; align-items: flex-start; }
+  .sec-icon { 
+    width: 32px; height: 32px; border-radius: 8px; 
+    background: rgba(244, 63, 94, 0.1); color: var(--accent-rose);
+    display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+  }
+  .sec-content h4 { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+  .sec-content p { font-size: 11px; color: var(--text-muted); }
+
+  .value-box {
+    margin-top: 24px; padding: 20px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.1) 0%, transparent 100%);
+    border: 1px solid rgba(20, 184, 166, 0.2);
+  }
+  .value-box h4 { font-size: 14px; color: var(--accent-teal); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .value-list li {
+    font-size: 12px; margin-bottom: 8px; padding-left: 16px; position: relative; list-style: none;
+  }
+  .value-list li::before {
+    content: '→'; position: absolute; left: 0; color: var(--accent-teal);
+  }
+
+  /* Connection Lines styling */
+  .flow-down {
+    text-align: center; padding: 8px 0; color: var(--border-color); font-size: 20px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1400px) {
+    .dashboard { grid-template-columns: 240px 1fr 280px; }
+  }
+  @media (max-width: 1100px) {
+    .dashboard { grid-template-columns: 1fr; }
+    .header { flex-direction: column; align-items: flex-start; gap: 24px; }
+    .header-right { width: 100%; }
+    .kpi-box { flex: 1; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  
+  <div class="container">
+    <header class="header">
+      <div class="header-left">
+        <p>Social Protection Fund (SPF)</p>
+        <h1>Executive Architecture Board</h1>
+      </div>
+      <div class="header-right">
+        <div class="kpi-box">
+          <div class="kpi-val">4.5M+</div>
+          <div class="kpi-label">Citizens Handled</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val">99.9%</div>
+          <div class="kpi-label">SLA Availability</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-val">Tier 1</div>
+          <div class="kpi-label">Data Sovereignty</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="dashboard">
+      
+      <!-- Left Column -->
+      <div class="left-col">
+        <div class="panel" style="margin-bottom: 24px;">
+          <div class="panel-title"><i>📥</i> Omnichannel Ingestion</div>
+          <div class="source-list">
+            <div class="source-item">
+              <span>Civil Identity & Family</span>
+              <div class="badge">API / RC</div>
+            </div>
+            <div class="source-item">
+              <span>Education & Enrollment</span>
+              <div class="badge">SFTP</div>
+            </div>
+            <div class="source-item">
+              <span>Labor & Employment</span>
+              <div class="badge">CDC</div>
+            </div>
+            <div class="source-item">
+              <span>Health Events (Births)</span>
+              <div class="badge">EVENTS</div>
+            </div>
+            <div class="source-item">
+              <span>Finance & CSR</span>
+              <div class="badge">BATCH</div>
+            </div>
+          </div>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 16px; line-height: 1.6;">
+            Zero-trust ingestion layer processing multi-modal data with automated schema validation, PII masking, and quarantine routing for failed records.
+          </p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><i>🏛️</i> Foundation Entities</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <span class="comp-tag" style="border-color: rgba(255,255,255,0.1)">Person (SCD-2)</span>
+            <span class="comp-tag" style="border-color: rgba(255,255,255,0.1)">Household Graph</span>
+            <span class="comp-tag" style="border-color: rgba(255,255,255,0.1)">Institution</span>
+            <span class="comp-tag" style="border-color: rgba(255,255,255,0.1)">Life Events</span>
+            <span class="comp-tag" style="border-color: rgba(255,255,255,0.1)">Eligibility Log</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Column (The Stack) -->
+      <div class="center-col">
+        <div class="panel">
+          <div class="panel-title"><i>🏗️</i> Core Application Stack</div>
+          
+          <div class="stack-container">
+            
+            <!-- Layer: Agentic AI -->
+            <div class="stack-layer layer-ai">
+              <div class="layer-info">
+                <h3>7. AI Agentic Platform</h3>
+                <p>Conversational Interface & Orchestration</p>
+              </div>
+              <div class="layer-components">
+                <span class="comp-tag">🤖 LangGraph Orchestrator</span>
+                <span class="comp-tag">💬 Arabic/Eng Chat</span>
+                <span class="comp-tag">🛠️ Governed Tool Registry</span>
+                <span class="comp-tag">✋ Human-in-the-Loop</span>
+              </div>
+            </div>
+            
+            <div class="flow-down">↑</div>
+
+            <!-- Layer: Serving & Analytics -->
+            <div class="stack-layer layer-analytics">
+              <div class="layer-info">
+                <h3>6. Analytics Serving</h3>
+                <p>Curated Data & API Consumption</p>
+              </div>
+              <div class="layer-components">
+                <span class="comp-tag">📊 Executive Dashboards</span>
+                <span class="comp-tag">🔌 REST/GraphQL APIs</span>
+                <span class="comp-tag">📈 SQL Warehouse</span>
+                <span class="comp-tag">📍 Geographic Mapping</span>
+              </div>
+            </div>
+
+            <div class="flow-down">↑</div>
+
+            <!-- Layer: ML & Rules Engine -->
+            <div class="stack-layer layer-ml">
+              <div class="layer-info">
+                <h3>5. Intelligence Engine</h3>
+                <p>Rules, MLOps, & Decision Logic</p>
+              </div>
+              <div class="layer-components">
+                <span class="comp-tag">⚖️ No-Code Policy Rules</span>
+                <span class="comp-tag">🧠 ML Predict & Rank</span>
+                <span class="comp-tag">🎯 Segment Builder</span>
+                <span class="comp-tag">📦 Model Registry</span>
+              </div>
+            </div>
+
+            <div class="flow-down">↑</div>
+
+            <!-- Layer: Processing -->
+            <div class="stack-layer layer-data">
+              <div class="layer-info">
+                <h3>4. Processing & Resolution</h3>
+                <p>Data Engineering & Entity Matching</p>
+              </div>
+              <div class="layer-components">
+                <span class="comp-tag">⚡ Apache Spark (ETL)</span>
+                <span class="comp-tag">🔗 Entity Resolution</span>
+                <span class="comp-tag">👨‍👩‍👦 Household Builder</span>
+                <span class="comp-tag">🧹 Data Quality Guard</span>
+              </div>
+            </div>
+
+            <div class="flow-down">↑</div>
+
+            <!-- Layer: Data Lakehouse -->
+            <div class="stack-layer layer-data" style="border-left-color: #64748b;">
+              <div class="layer-info">
+                <h3 style="color: #cbd5e1;">1-3. Data Lakehouse</h3>
+                <p>Immutable Storage & Curated Zones</p>
+              </div>
+              <div class="layer-components">
+                <span class="comp-tag">🥉 Bronze (Raw/Audit)</span>
+                <span class="comp-tag">🥈 Silver (Cleansed)</span>
+                <span class="comp-tag">🥇 Gold (Curated)</span>
+                <span class="comp-tag">🗄️ Delta Lake Format</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-col">
+        <div class="panel">
+          <div class="panel-title"><i>🛡️</i> Governance & Security</div>
+          
+          <div class="sec-list">
+            <div class="sec-item">
+              <div class="sec-icon">🔐</div>
+              <div class="sec-content">
+                <h4>Zero Trust IAM</h4>
+                <p>SSO, MFA, Role-Based Access (RBAC) & Attribute-Based Access (ABAC).</p>
+              </div>
+            </div>
+            
+            <div class="sec-item">
+              <div class="sec-icon">🇴🇲</div>
+              <div class="sec-content">
+                <h4>Data Sovereignty</h4>
+                <p>100% In-Country data residency. Customer Managed Keys (CMK) for encryption.</p>
+              </div>
+            </div>
+            
+            <div class="sec-item">
+              <div class="sec-icon">🕵️</div>
+              <div class="sec-content">
+                <h4>Immutable Audit</h4>
+                <p>Every transaction, API call, and AI prompt logged for forensic traceability.</p>
+              </div>
+            </div>
+            
+            <div class="sec-item">
+              <div class="sec-icon">🛑</div>
+              <div class="sec-content">
+                <h4>AI Guardrails</h4>
+                <p>PII masking, prompt injection filtering, and mandatory human review for funding.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="value-box">
+            <h4>📈 Business Outcomes</h4>
+            <ul class="value-list">
+              <li><strong>Zero Silos:</strong> Unified view across 8+ ministries.</li>
+              <li><strong>Speed:</strong> Minutes to determine eligibility vs. weeks of manual checks.</li>
+              <li><strong>Agility:</strong> Implement new policies without writing code via the Rules Engine.</li>
+              <li><strong>Accuracy:</strong> AI-driven deduplication and household resolution.</li>
+            </ul>
+          </div>
+          
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

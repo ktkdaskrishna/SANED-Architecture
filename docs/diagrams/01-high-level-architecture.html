@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASI — High-Level Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #111827;
+    --bg-card: #1a1f35;
+    --border-subtle: rgba(255,255,255,0.06);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --accent-teal: #2dd4bf;
+    --accent-blue: #3b82f6;
+    --accent-violet: #818cf8;
+    --accent-amber: #f59e0b;
+    --accent-rose: #f43f5e;
+    --accent-emerald: #10b981;
+    --accent-cyan: #06b6d4;
+    --accent-orange: #f97316;
+    --glow-teal: rgba(45,212,191,0.15);
+    --glow-blue: rgba(59,130,246,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .bg-grid {
+    position: fixed; inset:0; z-index:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .container { position:relative; z-index:1; max-width:1440px; margin:0 auto; padding:40px 32px; }
+  
+  /* Header */
+  .header { text-align:center; margin-bottom:48px; }
+  .header .badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background: rgba(45,212,191,0.1); border:1px solid rgba(45,212,191,0.25);
+    border-radius:100px; padding:6px 16px; font-size:12px; font-weight:600;
+    color: var(--accent-teal); text-transform:uppercase; letter-spacing:1.5px;
+    margin-bottom:16px;
+  }
+  .header h1 {
+    font-size:36px; font-weight:800; letter-spacing:-0.5px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .header p { color:var(--text-secondary); font-size:15px; margin-top:8px; max-width:720px; margin-left:auto; margin-right:auto; }
+
+  /* Layer Grid */
+  .layers { display:flex; flex-direction:column; gap:12px; }
+  .layer {
+    display:grid; grid-template-columns: 200px 1fr; gap:0;
+    border-radius:14px; overflow:hidden;
+    border:1px solid var(--border-subtle);
+    background: var(--bg-card);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .layer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .layer-label {
+    display:flex; flex-direction:column; justify-content:center; padding:20px 24px;
+    border-right:1px solid var(--border-subtle);
+    position:relative; overflow:hidden;
+  }
+  .layer-label::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+  }
+  .layer-label .num { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+  .layer-label .name { font-size:15px; font-weight:700; }
+  .layer-label .desc { font-size:11px; color:var(--text-secondary); margin-top:4px; line-height:1.4; }
+  .layer-content { display:flex; flex-wrap:wrap; gap:10px; padding:16px 20px; align-items:center; }
+  
+  .component {
+    display:flex; align-items:center; gap:8px;
+    padding:8px 14px; border-radius:8px;
+    font-size:12px; font-weight:500;
+    border:1px solid;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor:default;
+    position:relative;
+  }
+  .component:hover { transform:scale(1.05); }
+  .component .icon { font-size:16px; }
+  .component .tooltip {
+    display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%);
+    background:#1e293b; border:1px solid rgba(255,255,255,0.1); border-radius:8px;
+    padding:10px 14px; font-size:11px; color:var(--text-secondary); white-space:nowrap;
+    z-index:100; box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  }
+  .component:hover .tooltip { display:block; }
+  
+  /* Color schemes for layers */
+  .l1 .layer-label::before { background: var(--accent-blue); }
+  .l1 .layer-label .num { color: var(--accent-blue); }
+  .l1 .component { background:rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.2); color:#93c5fd; }
+  
+  .l2 .layer-label::before { background: var(--accent-teal); }
+  .l2 .layer-label .num { color: var(--accent-teal); }
+  .l2 .component { background:rgba(45,212,191,0.08); border-color:rgba(45,212,191,0.2); color:#5eead4; }
+  
+  .l3 .layer-label::before { background: var(--accent-violet); }
+  .l3 .layer-label .num { color: var(--accent-violet); }
+  .l3 .component { background:rgba(129,140,248,0.08); border-color:rgba(129,140,248,0.2); color:#a5b4fc; }
+  
+  .l4 .layer-label::before { background: var(--accent-amber); }
+  .l4 .layer-label .num { color: var(--accent-amber); }
+  .l4 .component { background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.2); color:#fbbf24; }
+  
+  .l5 .layer-label::before { background: var(--accent-emerald); }
+  .l5 .layer-label .num { color: var(--accent-emerald); }
+  .l5 .component { background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.2); color:#6ee7b7; }
+  
+  .l6 .layer-label::before { background: var(--accent-cyan); }
+  .l6 .layer-label .num { color: var(--accent-cyan); }
+  .l6 .component { background:rgba(6,182,212,0.08); border-color:rgba(6,182,212,0.2); color:#67e8f9; }
+  
+  .l7 .layer-label::before { background: var(--accent-orange); }
+  .l7 .layer-label .num { color: var(--accent-orange); }
+  .l7 .component { background:rgba(249,115,22,0.08); border-color:rgba(249,115,22,0.2); color:#fdba74; }
+
+  .l8 .layer-label::before { background: var(--accent-rose); }
+  .l8 .layer-label .num { color: var(--accent-rose); }
+  .l8 .component { background:rgba(244,63,94,0.08); border-color:rgba(244,63,94,0.2); color:#fda4af; }
+
+  /* Data flow arrows */
+  .flow-indicator {
+    display:flex; align-items:center; justify-content:center;
+    padding:4px 0;
+  }
+  .flow-indicator svg { opacity:0.3; }
+
+  /* Legend */
+  .legend {
+    margin-top:40px; padding:24px;
+    background:var(--bg-card); border-radius:14px;
+    border:1px solid var(--border-subtle);
+  }
+  .legend h3 { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-secondary); margin-bottom:16px; }
+  .legend-items { display:flex; flex-wrap:wrap; gap:16px; }
+  .legend-item { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-secondary); }
+  .legend-dot { width:10px; height:10px; border-radius:50%; }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from { opacity:0; transform:translateY(20px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  .layer { animation: fadeInUp 0.5s ease-out both; }
+  .layer:nth-child(1) { animation-delay:0.05s; }
+  .layer:nth-child(2) { animation-delay:0.1s; }
+  .layer:nth-child(3) { animation-delay:0.15s; }
+  .layer:nth-child(4) { animation-delay:0.2s; }
+  .layer:nth-child(5) { animation-delay:0.25s; }
+  .layer:nth-child(6) { animation-delay:0.3s; }
+  .layer:nth-child(7) { animation-delay:0.35s; }
+  .layer:nth-child(8) { animation-delay:0.4s; }
+
+  @media (max-width:900px) {
+    .layer { grid-template-columns:1fr; }
+    .layer-label { border-right:none; border-bottom:1px solid var(--border-subtle); }
+  }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="container">
+  <div class="header">
+    <div class="badge">🏛️ Government of Oman — Social Protection Fund</div>
+    <h1>PASI Platform — High-Level Architecture</h1>
+    <p>Data Lakehouse · MLOps · AI Agentic Platform — 8 Logical Layers</p>
+  </div>
+
+  <div class="layers">
+    <!-- L1: Source Integration -->
+    <div class="layer l1">
+      <div class="layer-label">
+        <div class="num">Layer 1</div>
+        <div class="name">Source Integration</div>
+        <div class="desc">Ministry & external data ingestion</div>
+      </div>
+      <div class="layer-content">
+        <div class="component"><span class="icon">🏢</span> Civil Identity API <span class="tooltip">NCSI civil registry, family records, national ID</span></div>
+        <div class="component"><span class="icon">🎓</span> Education Systems <span class="tooltip">Student enrollment, attendance, institutions</span></div>
+        <div class="component"><span class="icon">💼</span> Labor & Employment <span class="tooltip">Employment status, wage records, job registries</span></div>
+        <div class="component"><span class="icon">🏥</span> Health Systems <span class="tooltip">Disability, birth/death events, medical indicators</span></div>
+        <div class="component"><span class="icon">📍</span> Geography & Address <span class="tooltip">Municipal records, address hierarchy</span></div>
+        <div class="component"><span class="icon">💰</span> Finance & Payments <span class="tooltip">Benefit disbursement, CSR allocation records</span></div>
+        <div class="component"><span class="icon">📋</span> Batch File Drops <span class="tooltip">CSV, Excel, JSON file uploads via secure SFTP</span></div>
+        <div class="component"><span class="icon">🔌</span> Event Streams <span class="tooltip">Kafka/Event Hub for real-time events (births, deaths)</span></div>
+      </div>
+    </div>
+
+    <div class="flow-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+
+    <!-- L2: Landing & Data Lake -->
+    <div class="layer l2">
+      <div class="layer-label">
+        <div class="num">Layer 2</div>
+        <div class="name">Data Lake Storage</div>
+        <div class="desc">Raw → Standardized → Curated zones</div>
+      </div>
+      <div class="layer-content">
+        <div class="component"><span class="icon">📦</span> Raw Landing Zone <span class="tooltip">Immutable raw ingestion — forensic traceability</span></div>
+        <div class="component"><span class="icon">🔄</span> Standardized Zone <span class="tooltip">Schema-enforced, validated, deduped records</span></div>
+        <div class="component"><span class="icon">⭐</span> Curated / Gold Zone <span class="tooltip">Analytics-ready, governed marts & feature stores</span></div>
+        <div class="component"><span class="icon">🗄️</span> Object Storage (S3/ADLS) <span class="tooltip">Delta Lake / Iceberg on cloud object store</span></div>
+        <div class="component"><span class="icon">📊</span> Metadata Catalog <span class="tooltip">Unity Catalog / Glue — lineage, classification, governance</span></div>
+        <div class="component"><span class="icon">🔒</span> Quarantine Zone <span class="tooltip">Failed-validation records for stewardship review</span></div>
+      </div>
+    </div>
+
+    <div class="flow-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+
+    <!-- L3: Processing & Transformation -->
+    <div class="layer l3">
+      <div class="layer-label">
+        <div class="num">Layer 3</div>
+        <div class="name">Processing & ETL</div>
+        <div class="desc">Spark-based transformation pipelines</div>
+      </div>
+      <div class="layer-content">
+        <div class="component"><span class="icon">⚡</span> Apache Spark Engine <span class="tooltip">Distributed compute for batch & streaming ETL</span></div>
+        <div class="component"><span class="icon">🧹</span> Data Quality Engine <span class="tooltip">Great Expectations / Soda — schema, freshness, plausibility</span></div>
+        <div class="component"><span class="icon">🔗</span> Entity Resolution <span class="tooltip">Deterministic + probabilistic matching across sources</span></div>
+        <div class="component"><span class="icon">👨‍👩‍👧‍👦</span> Household Builder <span class="tooltip">Family linkage, dependency, residence-based construction</span></div>
+        <div class="component"><span class="icon">🔀</span> CDC Pipeline <span class="tooltip">Change Data Capture for incremental processing</span></div>
+        <div class="component"><span class="icon">📐</span> Schema Evolution <span class="tooltip">Automated schema migration & versioning</span></div>
+      </div>
+    </div>
+
+    <div class="flow-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+
+    <!-- L4: Master Registry -->
+    <div class="layer l4">
+      <div class="layer-label">
+        <div class="num">Layer 4</div>
+        <div class="name">Integrated Registry</div>
+        <div class="desc">Golden records & historized entities</div>
+      </div>
+      <div class="layer-content">
+        <div class="component"><span class="icon">👤</span> Person Registry <span class="tooltip">Golden person records with SCD Type-2 history</span></div>
+        <div class="component"><span class="icon">🏠</span> Household Registry <span class="tooltip">Composed from family, residence, dependency links</span></div>
+        <div class="component"><span class="icon">🏫</span> Institution Registry <span class="tooltip">Schools, hospitals, CSR partners, capacity data</span></div>
+        <div class="component"><span class="icon">📜</span> Benefit Programs <span class="tooltip">Program definitions, versions, active windows</span></div>
+        <div class="component"><span class="icon">✅</span> Eligibility Decisions <span class="tooltip">Decision log: eligible, rejected, pending, appealed</span></div>
+        <div class="component"><span class="icon">📅</span> Life Events <span class="tooltip">Birth, death, marriage, enrollment, employment changes</span></div>
+        <div class="component"><span class="icon">🌍</span> Geography Hierarchy <span class="tooltip">Governorate → Wilayat → Area → Block mapping</span></div>
+      </div>
+    </div>
+
+    <div class="flow-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+
+    <!-- L5: Rules & ML -->
+    <div class="layer l5">
+      <div class="layer-label">
+        <div class="num">Layer 5</div>
+        <div class="name">Rules & ML Engine</div>
+        <div class="desc">Eligibility, scoring, MLOps</div>
+      </div>
+      <div class="layer-content">
+        <div class="component"><span class="icon">⚖️</span> Rules Engine <span class="tooltip">No-code eligibility rules, Boolean logic, thresholds</span></div>
+        <div class="component"><span class="icon">🎯</span> Segment Builder <span class="tooltip">Reusable population segments: students, elderly, etc.</span></div>
+        <div class="component"><span class="icon">🧠</span> ML Training Pipelines <span class="tooltip">Clustering, ranking, anomaly detection, proxy scoring</span></div>
+        <div class="component"><span class="icon">📦</span> Model Registry <span class="tooltip">MLflow — version, stage, metrics, governance approval</span></div>
+        <div class="component"><span class="icon">🔍</span> Feature Store <span class="tooltip">Reusable features: income proxy, vulnerability score, etc.</span></div>
+        <div class="component"><span class="icon">📈</span> Model Monitoring <span class="tooltip">Drift detection, performance tracking, alert triggers</span></div>
+        <div class="component"><span class="icon">🧪</span> Simulation Engine <span class="tooltip">Policy impact simulation before production rollout</span></div>
+      </div>
+    </div>
+
+    <div class="flow-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+
+    <!-- L6: Curated Analytics & Serving -->
+    <div class="layer l6">
+      <div class="layer-label">
+        <div class="num">Layer 6</div>
+        <div class="name">Analytics & Serving</div>
+        <div class="desc">Dashboards, APIs, BI marts</div>
+      </div>
+      <div class="layer-content">
+        <div class="component"><span class="icon">📊</span> SQL Serving Layer <span class="tooltip">Governed analytical warehouse / SQL endpoint</span></div>
+        <div class="component"><span class="icon">📈</span> BI Dashboards <span class="tooltip">PowerBI / Superset — enrollment, coverage, budget</span></div>
+        <div class="component"><span class="icon">🔌</span> REST/GraphQL APIs <span class="tooltip">Programmatic access for downstream consumers</span></div>
+        <div class="component"><span class="icon">📋</span> Reporting Engine <span class="tooltip">Scheduled reports: regional, program overlap, CSR</span></div>
+        <div class="component"><span class="icon">📡</span> Event Publisher <span class="tooltip">Push notifications for eligibility changes, alerts</span></div>
+      </div>
+    </div>
+
+    <div class="flow-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+
+    <!-- L7: AI & Agentic -->
+    <div class="layer l7">
+      <div class="layer-label">
+        <div class="num">Layer 7</div>
+        <div class="name">AI Agentic Platform</div>
+        <div class="desc">Conversational AI & agent workflows</div>
+      </div>
+      <div class="layer-content">
+        <div class="component"><span class="icon">🤖</span> AI Orchestrator <span class="tooltip">LangGraph / Semantic Kernel — multi-agent coordination</span></div>
+        <div class="component"><span class="icon">💬</span> Arabic/English Chat <span class="tooltip">Bilingual conversational interface for authorized users</span></div>
+        <div class="component"><span class="icon">🔧</span> Tool Registry <span class="tooltip">Approved tools: eligibility lookup, segment query, allocation</span></div>
+        <div class="component"><span class="icon">🛡️</span> AI Guardrails <span class="tooltip">Prompt filtering, PII masking, governed data access</span></div>
+        <div class="component"><span class="icon">🏗️</span> Agent Builder <span class="tooltip">Admin-configured agents with human-in-the-loop approval</span></div>
+        <div class="component"><span class="icon">📝</span> Explanation Engine <span class="tooltip">Decision justification, confidence scores, traceability</span></div>
+      </div>
+    </div>
+
+    <div class="flow-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+
+    <!-- L8: Security & Observability -->
+    <div class="layer l8">
+      <div class="layer-label">
+        <div class="num">Layer 8</div>
+        <div class="name">Security & Governance</div>
+        <div class="desc">Cross-cutting: IAM, encryption, audit</div>
+      </div>
+      <div class="layer-content">
+        <div class="component"><span class="icon">🔐</span> IAM & RBAC/ABAC <span class="tooltip">SSO, MFA, role-based + attribute-based access</span></div>
+        <div class="component"><span class="icon">🔑</span> Key Management <span class="tooltip">Organization-managed keys, rotation, audit logging</span></div>
+        <div class="component"><span class="icon">🎭</span> Data Masking <span class="tooltip">Tokenization, column-level masking for PII</span></div>
+        <div class="component"><span class="icon">📜</span> Audit Trail <span class="tooltip">Immutable logs: every action, actor, timestamp</span></div>
+        <div class="component"><span class="icon">📡</span> Observability <span class="tooltip">Prometheus + Grafana — pipeline health, latency, drift</span></div>
+        <div class="component"><span class="icon">🛡️</span> SIEM Integration <span class="tooltip">Security events forwarded to SOC / Splunk</span></div>
+        <div class="component"><span class="icon">📋</span> Compliance Engine <span class="tooltip">Data residency, retention, consent enforcement</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <h3>Platform Statistics</h3>
+    <div class="legend-items">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-blue)"></div> 8 Source Domains</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-teal)"></div> 3 Storage Zones</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-violet)"></div> 6 Processing Engines</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-amber)"></div> 7 Registry Entities</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-emerald)"></div> 7 ML/Rules Components</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-cyan)"></div> 5 Serving Channels</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-orange)"></div> 6 AI Agents</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--accent-rose)"></div> 7 Security Controls</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

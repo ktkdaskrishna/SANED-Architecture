@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASI — Data Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--card:#131a2e;--border:rgba(255,255,255,.06);--text:#f1f5f9;--muted:#64748b;--teal:#2dd4bf;--blue:#3b82f6;--violet:#818cf8;--amber:#f59e0b;--emerald:#10b981;--cyan:#06b6d4;--orange:#f97316;--rose:#f43f5e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:48px 48px}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:40px 24px}
+.hdr{text-align:center;margin-bottom:40px}
+.hdr .tag{display:inline-block;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25);border-radius:100px;padding:5px 14px;font-size:11px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.hdr h1{font-size:30px;font-weight:800}
+.hdr p{color:var(--muted);font-size:14px;margin-top:6px}
+.stage{padding:20px;border-radius:14px;margin:6px 0;border:1px solid var(--border);background:var(--card);position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
+.stage:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.stage::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stage .sn{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.stage h3{font-size:15px;font-weight:700;margin-bottom:8px}
+.stage ul{list-style:none;columns:2;column-gap:20px}
+.stage li{font-size:12px;color:var(--muted);padding:3px 0;break-inside:avoid}
+.stage li::before{content:'→ ';opacity:.4}
+.arrow{text-align:center;padding:4px 0;opacity:.3;font-size:18px}
+.s1::before{background:var(--blue)}.s1 .sn{color:var(--blue)}
+.s2::before{background:var(--teal)}.s2 .sn{color:var(--teal)}
+.s3::before{background:var(--violet)}.s3 .sn{color:var(--violet)}
+.s4::before{background:var(--amber)}.s4 .sn{color:var(--amber)}
+.s5::before{background:var(--emerald)}.s5 .sn{color:var(--emerald)}
+.s6::before{background:var(--cyan)}.s6 .sn{color:var(--cyan)}
+.s7::before{background:var(--orange)}.s7 .sn{color:var(--orange)}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sec-bar{margin-top:16px;padding:16px 20px;border-radius:14px;border:1px solid rgba(244,63,94,.15);background:linear-gradient(135deg,rgba(244,63,94,.05),rgba(244,63,94,.02));display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.sec-bar h4{font-size:12px;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:1px}
+.sec-tag{padding:4px 10px;border-radius:6px;font-size:11px;background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.15);color:#fda4af}
+.stats{margin-top:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{padding:14px;border-radius:12px;background:var(--card);border:1px solid var(--border);text-align:center}
+.stat .v{font-size:26px;font-weight:800}.stat .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+@media(max-width:768px){.dual{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stage ul{columns:1}}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="wrap">
+<div class="hdr">
+<div class="tag">Data Architecture</div>
+<h1>End-to-End Data Flow</h1>
+<p>Full pipeline from ministry sources through AI-assisted decisions</p>
+</div>
+
+<div class="stage s1"><div class="sn">Stage 1 — Ingestion</div><h3>🔌 Source Integration & Capture</h3><ul><li>Civil ID API (REST, OAuth 2.0)</li><li>Education SFTP batch files</li><li>Health HL7/FHIR events</li><li>Labor DB replication (CDC)</li><li>Geography GeoJSON feeds</li><li>Payment reconciliation files</li><li>Source metadata capture</li><li>Schema contract validation</li></ul></div>
+<div class="arrow">▼</div>
+
+<div class="dual">
+<div class="stage s2"><div class="sn">Stage 2A — Raw Landing</div><h3>📦 Immutable Raw Zone</h3><ul><li>Source-partitioned object storage</li><li>Append-only, never modified</li><li>Forensic audit trail</li><li>Encrypted at rest (CMK)</li><li>7-year retention</li></ul></div>
+<div class="stage s2"><div class="sn">Stage 2B — Quarantine</div><h3>🚫 Validation Failures</h3><ul><li>Schema violations quarantined</li><li>Missing mandatory fields</li><li>Referential integrity breaks</li><li>Stewardship workflow</li><li>Remediation or rejection</li></ul></div>
+</div>
+<div class="arrow">▼</div>
+
+<div class="stage s3"><div class="sn">Stage 3 — Processing</div><h3>⚡ Transformation & Entity Resolution</h3><ul><li>Spark batch & streaming</li><li>Schema standardization</li><li>Deterministic ID matching</li><li>Probabilistic entity resolution</li><li>Household graph building</li><li>SCD Type-2 historization</li><li>Lineage metadata emission</li><li>Data quality validation</li></ul></div>
+<div class="arrow">▼</div>
+
+<div class="stage s4"><div class="sn">Stage 4 — Registry</div><h3>⭐ Integrated Master Entities</h3><ul><li>Person registry (golden records)</li><li>Household composition</li><li>Institution/capacity data</li><li>Geography hierarchy</li><li>Benefit program definitions</li><li>Eligibility decision log</li><li>Life events timeline</li><li>Payment references</li></ul></div>
+<div class="arrow">▼</div>
+
+<div class="dual">
+<div class="stage s5"><div class="sn">Stage 5A — Rules Engine</div><h3>⚖️ Eligibility & Segmentation</h3><ul><li>No-code rule definitions</li><li>Boolean logic + thresholds</li><li>Lookback & effective dates</li><li>Version control + approval</li><li>Simulation mode</li><li>Batch & on-demand</li></ul></div>
+<div class="stage s5"><div class="sn">Stage 5B — MLOps</div><h3>🧠 Model Lifecycle</h3><ul><li>Feature Store construction</li><li>Training: cluster, rank, anomaly</li><li>Model registry + versioning</li><li>Governance approval gate</li><li>Canary deploy + A/B test</li><li>Drift monitoring + retrain</li></ul></div>
+</div>
+<div class="arrow">▼</div>
+
+<div class="stage s6"><div class="sn">Stage 6 — Serving</div><h3>📊 Analytics Consumption</h3><ul><li>SQL warehouse endpoints</li><li>BI dashboards (PowerBI/Superset)</li><li>REST/GraphQL APIs</li><li>Scheduled reports</li><li>Row/column security</li><li>Event-driven notifications</li></ul></div>
+<div class="arrow">▼</div>
+
+<div class="stage s7"><div class="sn">Stage 7 — AI Agentic</div><h3>🤖 Conversational Intelligence</h3><ul><li>Arabic/English NLU</li><li>Agent Orchestrator (LangGraph)</li><li>Governed tool registry</li><li>Human-in-the-loop approval</li><li>CSR allocation recommendations</li><li>Prompt/response audit trail</li></ul></div>
+
+<div class="sec-bar">
+<h4>🛡️ Cross-Cutting Security</h4>
+<span class="sec-tag">🔐 IAM/SSO/MFA</span>
+<span class="sec-tag">🔑 KMS Encryption</span>
+<span class="sec-tag">🎭 PII Masking</span>
+<span class="sec-tag">📜 Immutable Audit</span>
+<span class="sec-tag">📡 Observability</span>
+<span class="sec-tag">🛡️ SIEM Feed</span>
+<span class="sec-tag">⚖️ Data Residency</span>
+</div>
+
+<div class="stats">
+<div class="stat"><div class="v" style="color:var(--blue)">8</div><div class="l">Source Domains</div></div>
+<div class="stat"><div class="v" style="color:var(--amber)">14</div><div class="l">Core Entities</div></div>
+<div class="stat"><div class="v" style="color:var(--emerald)">5</div><div class="l">ML Domains</div></div>
+<div class="stat"><div class="v" style="color:var(--orange)">4.5M</div><div class="l">Persons Scale</div></div>
+</div>
+</div>
+</body>
+</html>

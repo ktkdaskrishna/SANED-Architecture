@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANED — Architecture Portal</title>
+<meta name="description" content="SANED National Social Protection Intelligence Platform — Architecture Documentation Portal">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:    #04060c;
+    --bg-base:    #0a0e1a;
+    --bg-surface: #111828;
+    --bg-raised:  #17203a;
+    --bg-hover:   #1e2a4a;
+    --border-dim:    rgba(255,255,255,0.06);
+    --border-subtle: rgba(255,255,255,0.10);
+    --border-accent: rgba(255,255,255,0.16);
+    --text-primary:   #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted:     #64748b;
+    --teal:     #14b8a6;
+    --teal-dim: rgba(20,184,166,0.12);
+    --blue:     #3b82f6;
+    --blue-dim: rgba(59,130,246,0.12);
+    --amber:    #f59e0b;
+    --amber-dim:rgba(245,158,11,0.10);
+    --rose:     #f43f5e;
+    --rose-dim: rgba(244,63,94,0.10);
+    --emerald:  #10b981;
+    --emerald-dim: rgba(16,185,129,0.10);
+    --violet:   #8b5cf6;
+    --violet-dim:rgba(139,92,246,0.10);
+    --orange:   #f97316;
+    --orange-dim:rgba(249,115,22,0.10);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg-void);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .canvas-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 60%, rgba(20,184,166,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 35% at 80% 20%, rgba(59,130,246,0.05) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 50% 90%, rgba(249,115,22,0.04) 0%, transparent 70%),
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 60px 40px 100px; }
+
+  /* ─── HERO ─── */
+  .hero {
+    text-align: center; padding: 80px 20px 60px; position: relative;
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: 0; left: 10%; right: 10%;
+    height: 1px; background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+  }
+  .hero .shield { font-size: 64px; margin-bottom: 20px; display: block; }
+  .hero h1 {
+    font-size: 56px; font-weight: 900; letter-spacing: -1.5px; line-height: 1.1;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--teal) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero .ar-name {
+    font-family: 'Noto Kufi Arabic', sans-serif; font-size: 36px; font-weight: 700;
+    color: var(--teal); margin-top: 8px; display: block;
+    -webkit-text-fill-color: var(--teal);
+  }
+  .hero .tagline {
+    color: var(--text-secondary); font-size: 16px; max-width: 700px;
+    margin: 20px auto 0; line-height: 1.7;
+  }
+  .hero .meta-badges {
+    display: flex; justify-content: center; gap: 10px; margin-top: 28px; flex-wrap: wrap;
+  }
+  .meta-badge {
+    padding: 6px 16px; border-radius: 20px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.2px; white-space: nowrap;
+  }
+  .mb-gov  { background: var(--teal-dim);   border: 1px solid rgba(20,184,166,0.3);  color: var(--teal); }
+  .mb-core { background: var(--orange-dim); border: 1px solid rgba(249,115,22,0.3);  color: var(--orange); }
+  .mb-ai   { background: var(--violet-dim); border: 1px solid rgba(139,92,246,0.3);  color: var(--violet); }
+  .mb-sec  { background: var(--rose-dim);   border: 1px solid rgba(244,63,94,0.3);   color: var(--rose); }
+
+  /* ─── SECTION HEADER ─── */
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    margin: 56px 0 24px; padding-left: 2px;
+  }
+  .sh-chip {
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 5px 14px; border-radius: 14px; white-space: nowrap;
+    background: var(--teal-dim); border: 1px solid rgba(20,184,166,0.25); color: var(--teal);
+  }
+  .sh-line { flex: 1; height: 1px; background: var(--border-dim); }
+
+  /* ─── DIAGRAM CARDS ─── */
+  .diagram-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+  .diagram-card {
+    background: var(--bg-surface); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg); padding: 28px 24px; position: relative; overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    cursor: pointer; text-decoration: none; display: block; color: inherit;
+  }
+  .diagram-card:hover {
+    border-color: var(--teal);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(20,184,166,0.08), 0 0 0 1px rgba(20,184,166,0.15);
+  }
+  .diagram-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .diagram-card:hover::before { opacity: 1; }
+
+  .dc-icon {
+    width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 22px; margin-bottom: 16px;
+  }
+  .diagram-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .diagram-card p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; }
+  .dc-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
+  .dc-tag {
+    background: rgba(0,0,0,0.35); border: 1px solid var(--border-dim);
+    padding: 3px 10px; border-radius: 10px; font-size: 9px; font-weight: 600;
+    color: var(--text-muted); white-space: nowrap;
+  }
+  .dc-arrow {
+    position: absolute; bottom: 20px; right: 20px; font-size: 18px;
+    color: var(--text-muted); transition: all 0.3s; opacity: 0;
+  }
+  .diagram-card:hover .dc-arrow { opacity: 1; color: var(--teal); transform: translateX(3px); }
+
+  /* Card Variants */
+  .dc-corex .dc-icon { background: var(--orange-dim); }
+  .dc-corex::before  { background: linear-gradient(90deg, var(--orange), transparent); }
+  .dc-lake .dc-icon  { background: var(--blue-dim); }
+  .dc-lake::before   { background: linear-gradient(90deg, var(--blue), transparent); }
+  .dc-ml .dc-icon    { background: var(--violet-dim); }
+  .dc-ml::before     { background: linear-gradient(90deg, var(--violet), transparent); }
+  .dc-ai .dc-icon    { background: var(--teal-dim); }
+  .dc-ai::before     { background: linear-gradient(90deg, var(--teal), transparent); }
+  .dc-sec .dc-icon   { background: var(--rose-dim); }
+  .dc-sec::before    { background: linear-gradient(90deg, var(--rose), transparent); }
+  .dc-exec .dc-icon  { background: var(--amber-dim); }
+  .dc-exec::before   { background: linear-gradient(90deg, var(--amber), transparent); }
+  .dc-full .dc-icon  { background: var(--emerald-dim); }
+  .dc-full::before   { background: linear-gradient(90deg, var(--emerald), transparent); }
+
+  /* ─── FEATURED CARD (FULL WIDTH) ─── */
+  .featured {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(20,184,166,0.04), rgba(59,130,246,0.03));
+    border: 1px solid rgba(20,184,166,0.15);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center;
+    padding: 36px 32px;
+  }
+  .featured .f-content h3 { font-size: 22px; }
+  .featured .f-content p { font-size: 13.5px; margin-top: 10px; }
+  .featured .f-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .f-stat {
+    background: var(--bg-raised); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-sm); padding: 14px; text-align: center;
+  }
+  .f-stat .fs-val { font-size: 24px; font-weight: 800; color: var(--teal); }
+  .f-stat .fs-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* ─── FOOTER ─── */
+  .portal-footer {
+    margin-top: 80px; padding-top: 32px;
+    border-top: 1px solid var(--border-dim);
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--text-muted); font-size: 11px;
+  }
+  .portal-footer a { color: var(--teal); text-decoration: none; }
+  .portal-footer a:hover { text-decoration: underline; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 960px) {
+    .diagram-grid { grid-template-columns: repeat(2, 1fr); }
+    .featured { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 40px; }
+  }
+  @media (max-width: 640px) {
+    .page { padding: 30px 20px 60px; }
+    .diagram-grid { grid-template-columns: 1fr; }
+    .hero { padding: 40px 10px 40px; }
+    .hero h1 { font-size: 32px; }
+    .f-stats { grid-template-columns: 1fr !important; }
+  }
+</style>
+</head>
+<body>
+<div class="canvas-bg"></div>
+
+<div class="page">
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+    <span class="shield">🛡️</span>
+    <h1>SANED</h1>
+    <span class="ar-name">سانِد</span>
+    <p class="tagline">
+      National Social Protection & Welfare Intelligence Platform — Full-stack sovereign architecture documentation for the Sultanate of Oman. From CoreX GPU infrastructure through Data Lakehouse, MLOps, and Agentic AI.
+    </p>
+    <div class="meta-badges">
+      <span class="meta-badge mb-core">CoreX Infrastructure</span>
+      <span class="meta-badge mb-ai">Lakehouse + MLOps</span>
+      <span class="meta-badge mb-gov">Sovereign Agentic AI</span>
+      <span class="meta-badge mb-sec">Government-Grade Security</span>
+    </div>
+  </section>
+
+  <!-- ═══ EXECUTIVE VIEWS ═══ -->
+  <div class="section-header">
+    <span class="sh-chip" style="background:var(--amber-dim);border-color:rgba(245,158,11,0.25);color:var(--amber);">Executive Views</span>
+    <span class="sh-line"></span>
+  </div>
+
+  <div class="diagram-grid">
+
+    <!-- FEATURED: Full-Stack Architecture -->
+    <a href="diagrams/09-saned-fullstack-architecture.html" class="diagram-card featured dc-full">
+      <div class="f-content">
+        <div class="dc-icon">🏗️</div>
+        <h3>SANED Full-Stack Architecture</h3>
+        <p>Complete 5-tier architecture from CoreX GPU/HW infrastructure foundation through Data Lakehouse, MLOps intelligence layer, to Agentic AI serving. The definitive CXO reference.</p>
+        <div class="dc-tags">
+          <span class="dc-tag">CoreX Platform</span>
+          <span class="dc-tag">Medallion Lakehouse</span>
+          <span class="dc-tag">ML Middleware</span>
+          <span class="dc-tag">Agent Builder</span>
+          <span class="dc-tag">RAG + Vector</span>
+        </div>
+      </div>
+      <div class="f-stats">
+        <div class="f-stat"><div class="fs-val">5</div><div class="fs-label">Architecture Tiers</div></div>
+        <div class="f-stat"><div class="fs-val">9</div><div class="fs-label">Decision Steps</div></div>
+        <div class="f-stat"><div class="fs-val">4</div><div class="fs-label">Grant Programs</div></div>
+      </div>
+      <span class="dc-arrow">→</span>
+    </a>
+
+    <a href="diagrams/08-himaya-platform-architecture.html" class="diagram-card dc-exec">
+      <div class="dc-icon">📊</div>
+      <h3>HIMAYA Intelligence Platform</h3>
+      <p>7-layer intelligence architecture with ML middleware, sovereign security framework, and 4 core program delivery flows.</p>
+      <div class="dc-tags">
+        <span class="dc-tag">7 Layers</span>
+        <span class="dc-tag">ML Middleware</span>
+        <span class="dc-tag">AI Gateway</span>
+      </div>
+      <span class="dc-arrow">→</span>
+    </a>
+
+    <a href="diagrams/07-cxo-comprehensive-architecture.html" class="diagram-card dc-exec">
+      <div class="dc-icon">🎯</div>
+      <h3>CXO Comprehensive Dashboard</h3>
+      <p>Consolidated executive view combining data flows, entity registry, ML pipelines, and security governance in a single dashboard.</p>
+      <div class="dc-tags">
+        <span class="dc-tag">Executive Summary</span>
+        <span class="dc-tag">All-in-One</span>
+      </div>
+      <span class="dc-arrow">→</span>
+    </a>
+
+  </div>
+
+  <!-- ═══ ARCHITECTURE LAYERS ═══ -->
+  <div class="section-header">
+    <span class="sh-chip">Architecture Deep-Dives</span>
+    <span class="sh-line"></span>
+  </div>
+
+  <div class="diagram-grid">
+
+    <a href="diagrams/01-high-level-architecture.html" class="diagram-card dc-lake">
+      <div class="dc-icon">🏛️</div>
+      <h3>High-Level Architecture</h3>
+      <p>8-layer logical architecture overview. Source integration, lakehouse storage, processing, entity registry, rules engine, analytics, and AI platform.</p>
+      <div class="dc-tags">
+        <span class="dc-tag">8 Layers</span>
+        <span class="dc-tag">14 Entities</span>
+        <span class="dc-tag">Logical View</span>
+      </div>
+      <span class="dc-arrow">→</span>
+    </a>
+
+    <a href="diagrams/02-data-flow.html" class="diagram-card dc-lake">
+      <div class="dc-icon">🔄</div>
+      <h3>End-to-End Data Flow</h3>
+      <p>Complete data journey from 8+ ministry source systems through ingestion, ETL, entity resolution, to analytics serving and AI consumption.</p>
+      <div class="dc-tags">
+        <span class="dc-tag">ETL Pipeline</span>
+        <span class="dc-tag">CDC Streams</span>
+        <span class="dc-tag">Data Lineage</span>
+      </div>
+      <span class="dc-arrow">→</span>
+    </a>
+
+    <a href="diagrams/03-lakehouse-zones.html" class="diagram-card dc-lake">
+      <div class="dc-icon">💎</div>
+      <h3>Lakehouse Medallion Zones</h3>
+      <p>Bronze → Silver → Gold zone architecture. Immutable landing, DQ validation, entity resolution, and analytics-ready curated models.</p>
+      <div class="dc-tags">
+        <span class="dc-tag">Bronze/Silver/Gold</span>
+        <span class="dc-tag">ACID Upserts</span>
+        <span class="dc-tag">Schema Evolution</span>
+      </div>
+      <span class="dc-arrow">→</span>
+    </a>
+
+    <a href="diagrams/04-mlops-pipeline.html" class="diagram-card dc-ml">
+      <div class="dc-icon">🧠</div>
+      <h3>MLOps Pipeline</h3>
+      <p>6-phase ML lifecycle. Feature engineering, experiment tracking, model training, registry governance, canary deployment, and drift monitoring.</p>
+      <div class="dc-tags">
+        <span class="dc-tag">AutoML</span>
+        <span class="dc-tag">Model Registry</span>
+        <span class="dc-tag">Drift Detection</span>
+      </div>
+      <span class="dc-arrow">→</span>
+    </a>
+
+    <a href="diagrams/05-ai-agentic-platform.html" class="diagram-card dc-ai">
+      <div class="dc-icon">🤖</div>
+      <h3>AI Agentic Platform</h3>
+      <p>5-tier agent architecture. Presentation layer, orchestration engine, tool registry, safety guardrails, and sovereign LLM foundation.</p>
+      <div class="dc-tags">
+        <span class="dc-tag">Agent Builder</span>
+        <span class="dc-tag">RAG Pipeline</span>
+        <span class="dc-tag">HITL Approval</span>
+      </div>
+      <span class="dc-arrow">→</span>
+    </a>
+
+    <a href="diagrams/06-security-governance.html" class="diagram-card dc-sec">
+      <div class="dc-icon">🔐</div>
+      <h3>Security & Governance</h3>
+      <p>Sovereign security framework. Zero-trust identity, encryption with CMK, PII protection, AI safety controls, and compliance mapping.</p>
+      <div class="dc-tags">
+        <span class="dc-tag">Zero Trust</span>
+        <span class="dc-tag">AES-256 / CMK</span>
+        <span class="dc-tag">Data Residency</span>
+      </div>
+      <span class="dc-arrow">→</span>
+    </a>
+
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="portal-footer">
+    <div>SANED سانِد — Sultanate of Oman · Social Protection Intelligence Platform · Confidential</div>
+    <div>Powered by <a href="#">CoreX Platform</a> · v1.0</div>
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HIMAYA — National Social Protection Intelligence Platform</title>
+<meta name="description" content="CXO Architecture: National-scale Social Protection Intelligence Platform for the Sultanate of Oman">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ───────────── DESIGN SYSTEM ───────────── */
+  :root {
+    --bg-void:    #04060c;
+    --bg-base:    #0a0e1a;
+    --bg-surface: #111828;
+    --bg-raised:  #17203a;
+    --bg-hover:   #1e2a4a;
+
+    --border-dim:    rgba(255,255,255,0.06);
+    --border-subtle: rgba(255,255,255,0.10);
+    --border-accent: rgba(255,255,255,0.16);
+
+    --text-primary:   #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted:     #64748b;
+
+    /* Sovereign palette — no vendor branding */
+    --teal:     #14b8a6;
+    --teal-dim: rgba(20,184,166,0.12);
+    --blue:     #3b82f6;
+    --blue-dim: rgba(59,130,246,0.12);
+    --amber:    #f59e0b;
+    --amber-dim:rgba(245,158,11,0.10);
+    --rose:     #f43f5e;
+    --rose-dim: rgba(244,63,94,0.10);
+    --emerald:  #10b981;
+    --emerald-dim: rgba(16,185,129,0.10);
+    --violet:   #8b5cf6;
+    --violet-dim:rgba(139,92,246,0.10);
+    --cyan:     #06b6d4;
+    --cyan-dim: rgba(6,182,212,0.10);
+    --slate:    #cbd5e1;
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg-void);
+    color: var(--text-primary);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ───────── BACKGROUND EFFECTS ───────── */
+  .canvas-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 10%, rgba(20,184,166,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 85% 80%, rgba(59,130,246,0.05) 0%, transparent 70%),
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+  }
+
+  /* ───────── LAYOUT ───────── */
+  .page { position: relative; z-index: 1; max-width: 1600px; margin: 0 auto; padding: 36px 40px 80px; }
+
+  /* ───────── MASTHEAD ───────── */
+  .masthead {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 1px solid var(--border-dim); padding-bottom: 28px; margin-bottom: 36px;
+  }
+  .masthead-left h1 { font-size: 36px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.15; }
+  .masthead-left h1 .ar { font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 700; color: var(--teal); font-size: 28px; margin-left: 10px; }
+  .masthead-left .sub { color: var(--text-secondary); font-size: 14px; margin-top: 6px; max-width: 620px; }
+  .masthead-right { display: flex; gap: 10px; align-items: center; }
+  .badge {
+    padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.2px; white-space: nowrap;
+  }
+  .badge-gov  { background: var(--teal-dim); border: 1px solid rgba(20,184,166,0.3); color: var(--teal); }
+  .badge-arch { background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.3); color: var(--blue); }
+
+  /* ───────── KPI ROW ───────── */
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 36px; }
+  .kpi {
+    background: var(--bg-surface); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-md); padding: 20px; text-align: center;
+  }
+  .kpi-val { font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .kpi-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* ───────── SECTION HEADER ───────── */
+  .section-hdr {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;
+    color: var(--text-muted); margin: 36px 0 16px; padding-left: 4px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-hdr::after { content: ''; flex: 1; height: 1px; background: var(--border-dim); }
+
+  /* ───────── CORE 3-PANEL GRID ───────── */
+  .arch-grid { display: grid; grid-template-columns: 280px 1fr 280px; gap: 20px; }
+
+  /* ── PANEL BASE ── */
+  .panel {
+    background: var(--bg-surface); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg); padding: 24px; position: relative; overflow: hidden;
+  }
+  .panel::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--teal), transparent); opacity: 0.3;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.8px;
+    color: var(--text-muted); margin-bottom: 20px;
+  }
+
+  /* ── LEFT PANEL: Personas ── */
+  .persona {
+    background: var(--bg-raised); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px;
+    border-left: 3px solid; transition: background 0.25s;
+  }
+  .persona:hover { background: var(--bg-hover); }
+  .persona h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .persona p  { font-size: 10.5px; color: var(--text-secondary); line-height: 1.5; }
+  .p-citizen  { border-left-color: var(--blue);    } .p-citizen  h4 { color: var(--blue); }
+  .p-gov      { border-left-color: var(--teal);    } .p-gov      h4 { color: var(--teal); }
+  .p-csr      { border-left-color: var(--amber);   } .p-csr      h4 { color: var(--amber); }
+  .p-auditor  { border-left-color: var(--rose);    } .p-auditor  h4 { color: var(--rose); }
+
+  .channel-strip {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+  }
+  .ch-tag {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border-dim);
+    padding: 4px 10px; border-radius: 14px; font-size: 9.5px; font-weight: 600; color: var(--text-secondary);
+  }
+
+  /* ── CENTER PANEL: Architecture Stack ── */
+  .stack { display: flex; flex-direction: column; gap: 4px; }
+  .layer {
+    background: var(--bg-raised); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-md); padding: 18px 20px;
+    display: grid; grid-template-columns: 210px 1fr; gap: 16px; align-items: center;
+    transition: border-color 0.3s, box-shadow 0.3s; cursor: default;
+  }
+  .layer:hover { border-color: var(--border-accent); box-shadow: 0 0 20px rgba(20,184,166,0.06); }
+  .layer-label { display: flex; align-items: center; gap: 10px; }
+  .layer-num {
+    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+  }
+  .layer-label h3 { font-size: 13px; font-weight: 700; }
+  .layer-label p  { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+  .comps { display: flex; flex-wrap: wrap; gap: 6px; }
+  .comp {
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim);
+    padding: 6px 12px; border-radius: var(--radius-sm); font-size: 10px; font-weight: 600;
+    color: var(--text-secondary); white-space: nowrap; transition: border-color 0.2s;
+  }
+  .comp:hover { border-color: var(--border-accent); }
+  .comp-hl { border-color: rgba(20,184,166,0.35); color: var(--teal); }
+
+  /* Layer color coding */
+  .l-ingest  .layer-num { background: var(--cyan-dim);    color: var(--cyan);    }
+  .l-lake    .layer-num { background: var(--blue-dim);    color: var(--blue);    }
+  .l-process .layer-num { background: var(--emerald-dim); color: var(--emerald); }
+  .l-feature .layer-num { background: var(--amber-dim);   color: var(--amber);   }
+  .l-mlops   .layer-num { background: var(--violet-dim);  color: var(--violet);  }
+  .l-serve   .layer-num { background: var(--teal-dim);    color: var(--teal);    }
+  .l-agent   .layer-num { background: var(--rose-dim);    color: var(--rose);    }
+
+  .flow-connector {
+    text-align: center; color: var(--text-muted); font-size: 16px; line-height: 1;
+    padding: 2px 0; opacity: 0.4;
+  }
+
+  /* ── RIGHT PANEL: Intelligence & Middleware ── */
+  .info-card {
+    background: var(--bg-raised); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px;
+  }
+  .info-card h4 {
+    font-size: 12px; font-weight: 700; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .info-list { list-style: none; }
+  .info-list li {
+    font-size: 10.5px; display: flex; justify-content: space-between; align-items: center;
+    padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .info-list li:last-child { border-bottom: none; }
+  .info-list .val { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
+
+  .mw-card {
+    background: var(--bg-raised); border: 1px solid rgba(20,184,166,0.15);
+    border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px;
+  }
+  .mw-card h4 { font-size: 12px; color: var(--teal); font-weight: 700; margin-bottom: 6px; }
+  .mw-card p  { font-size: 10.5px; color: var(--text-secondary); line-height: 1.5; }
+  .mw-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+  .mw-tag {
+    background: rgba(20,184,166,0.08); border: 1px solid rgba(20,184,166,0.2);
+    color: var(--teal); padding: 3px 10px; border-radius: 12px; font-size: 9px; font-weight: 700;
+  }
+
+  /* ───────── SECURITY FOOTER ───────── */
+  .sec-footer {
+    margin-top: 36px; background: var(--bg-surface); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg); padding: 28px; position: relative; overflow: hidden;
+  }
+  .sec-footer::before {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--rose), var(--amber), var(--teal)); opacity: 0.4;
+  }
+  .sec-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; }
+  .sec-domain {
+    background: var(--bg-raised); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-sm); padding: 14px; text-align: center;
+    transition: border-color 0.3s;
+  }
+  .sec-domain:hover { border-color: var(--rose); }
+  .sec-domain .sec-icon { font-size: 22px; margin-bottom: 6px; }
+  .sec-domain h5 { font-size: 10.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .sec-domain p  { font-size: 9px; color: var(--text-muted); line-height: 1.4; }
+
+  /* ───────── DATA FLOW STRIP ───────── */
+  .flow-strip {
+    margin-top: 36px; background: var(--bg-surface); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg); padding: 28px;
+  }
+  .flow-steps { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .flow-step {
+    text-align: center; padding: 14px 8px;
+    background: var(--bg-raised); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-sm); position: relative;
+  }
+  .flow-step::after {
+    content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 14px; opacity: 0.4;
+  }
+  .flow-step:last-child::after { content: none; }
+  .flow-step .fs-num { font-size: 22px; margin-bottom: 4px; }
+  .flow-step h5 { font-size: 10px; font-weight: 700; margin-bottom: 2px; }
+  .flow-step p  { font-size: 9px; color: var(--text-muted); }
+
+  /* ───────── RESPONSIVE ───────── */
+  @media (max-width: 1200px) {
+    .arch-grid { grid-template-columns: 1fr; }
+    .kpi-row   { grid-template-columns: repeat(3, 1fr); }
+    .sec-grid  { grid-template-columns: repeat(3, 1fr); }
+    .flow-steps { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .page { padding: 20px; }
+    .masthead { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .kpi-row   { grid-template-columns: repeat(2, 1fr); }
+    .sec-grid  { grid-template-columns: repeat(2, 1fr); }
+    .flow-steps { grid-template-columns: 1fr 1fr; }
+    .layer { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="canvas-bg"></div>
+
+<div class="page">
+
+  <!-- ═══════════ MASTHEAD ═══════════ -->
+  <header class="masthead">
+    <div class="masthead-left">
+      <h1>HIMAYA <span class="ar">حماية</span></h1>
+      <p class="sub">National Social Protection Intelligence Platform — Unifying beneficiary data, ML-driven segmentation, and agentic AI to power equitable grant delivery, CSR allocation, and welfare facility distribution across the Sultanate of Oman.</p>
+    </div>
+    <div class="masthead-right">
+      <span class="badge badge-gov">Sovereign Platform</span>
+      <span class="badge badge-arch">Lakehouse + ML + Agentic AI</span>
+    </div>
+  </header>
+
+  <!-- ═══════════ KPI ROW ═══════════ -->
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--teal)">4.5M+</div>
+      <div class="kpi-lbl">Citizens Covered</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--blue)">1.2M</div>
+      <div class="kpi-lbl">Households Resolved</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--amber)">8+</div>
+      <div class="kpi-lbl">Source Ministries</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--emerald)">99.9%</div>
+      <div class="kpi-lbl">Platform SLA</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--rose)">100%</div>
+      <div class="kpi-lbl">In-Country Data</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ MAIN ARCHITECTURE ═══════════ -->
+  <div class="section-hdr">Platform Architecture</div>
+
+  <div class="arch-grid">
+
+    <!-- ═══ LEFT PANEL: Omnichannel Access ═══ -->
+    <div class="panel">
+      <div class="panel-title">Stakeholders & Channels</div>
+
+      <div class="persona p-citizen">
+        <h4>👤 Citizens & Beneficiaries</h4>
+        <p>Apply for grants: student transport (50 OMR/mo), newborn baby facility, BPL food support. Track status via Arabic/English conversational AI.</p>
+      </div>
+
+      <div class="persona p-gov">
+        <h4>🏛️ Government & Fund Officers</h4>
+        <p>Design benefit programs, configure eligibility rules, review coverage gaps, approve disbursements, and monitor regional equity.</p>
+      </div>
+
+      <div class="persona p-csr">
+        <h4>🏢 CSR Contributors & Corporates</h4>
+        <p>Allocate CSR budgets to high-need segments. AI recommends ranked options by poverty index, geography, and unmet need.</p>
+      </div>
+
+      <div class="persona p-auditor">
+        <h4>🔍 Auditors & Compliance</h4>
+        <p>Review immutable decision trails, model governance logs, access histories, and policy change records.</p>
+      </div>
+
+      <div class="channel-strip">
+        <span class="ch-tag">Web Portal</span>
+        <span class="ch-tag">Mobile PWA</span>
+        <span class="ch-tag">AI Chat (AR/EN)</span>
+        <span class="ch-tag">REST APIs</span>
+        <span class="ch-tag">BI Dashboards</span>
+      </div>
+    </div>
+
+    <!-- ═══ CENTER PANEL: Architecture Stack ═══ -->
+    <div class="panel" style="padding: 24px 20px;">
+      <div class="panel-title">7-Layer Intelligence Architecture</div>
+
+      <div class="stack">
+
+        <!-- L7: Agentic AI -->
+        <div class="layer l-agent">
+          <div class="layer-label">
+            <div class="layer-num">7</div>
+            <div><h3>Agentic AI Platform</h3><p>Conversational intelligence & agent builder</p></div>
+          </div>
+          <div class="comps">
+            <span class="comp comp-hl">Agent Orchestration Engine</span>
+            <span class="comp comp-hl">AI Gateway & Guardrails</span>
+            <span class="comp">Vector Search (RAG)</span>
+            <span class="comp">Conversation Memory</span>
+            <span class="comp">Human-in-the-Loop</span>
+            <span class="comp">Agent Builder (No-Code)</span>
+          </div>
+        </div>
+        <div class="flow-connector">↑</div>
+
+        <!-- L6: Analytics & Serving -->
+        <div class="layer l-serve">
+          <div class="layer-label">
+            <div class="layer-num">6</div>
+            <div><h3>Analytics & Serving</h3><p>Dashboards, APIs, and governed outputs</p></div>
+          </div>
+          <div class="comps">
+            <span class="comp">SQL Analytics Engine</span>
+            <span class="comp">BI Dashboard Layer</span>
+            <span class="comp">REST / GraphQL APIs</span>
+            <span class="comp">Scheduled Reports</span>
+            <span class="comp">Event Publisher</span>
+          </div>
+        </div>
+        <div class="flow-connector">↑</div>
+
+        <!-- L5: MLOps & Rules -->
+        <div class="layer l-mlops">
+          <div class="layer-label">
+            <div class="layer-num">5</div>
+            <div><h3>MLOps & Rules Engine</h3><p>Clustering, scoring, eligibility, and no-code rules</p></div>
+          </div>
+          <div class="comps">
+            <span class="comp comp-hl">AutoML Pipeline</span>
+            <span class="comp comp-hl">Model Registry & Governance</span>
+            <span class="comp">Experiment Tracking</span>
+            <span class="comp">Custom Model Training</span>
+            <span class="comp">No-Code Eligibility Rules</span>
+            <span class="comp">Drift Monitoring</span>
+          </div>
+        </div>
+        <div class="flow-connector">↑</div>
+
+        <!-- L4: Feature Store & Middleware -->
+        <div class="layer l-feature">
+          <div class="layer-label">
+            <div class="layer-num">4</div>
+            <div><h3>Feature Store & Middleware</h3><p>Scalable, configurable segmentation layer</p></div>
+          </div>
+          <div class="comps">
+            <span class="comp comp-hl">Feature Store (Online + Offline)</span>
+            <span class="comp">Age-Group Encoder</span>
+            <span class="comp">Poverty Index Calculator</span>
+            <span class="comp">Location Geo-Hasher</span>
+            <span class="comp">Household Graph Features</span>
+            <span class="comp">Temporal Windowing</span>
+          </div>
+        </div>
+        <div class="flow-connector">↑</div>
+
+        <!-- L3: Processing & Entity Resolution -->
+        <div class="layer l-process">
+          <div class="layer-label">
+            <div class="layer-num">3</div>
+            <div><h3>Processing & Resolution</h3><p>ETL, quality gates, identity matching</p></div>
+          </div>
+          <div class="comps">
+            <span class="comp">Distributed Compute Engine</span>
+            <span class="comp">Data Quality Framework</span>
+            <span class="comp">Entity Resolution (Person)</span>
+            <span class="comp">Household Graph Builder</span>
+            <span class="comp">Schema Evolution</span>
+          </div>
+        </div>
+        <div class="flow-connector">↑</div>
+
+        <!-- L2: Data Lakehouse -->
+        <div class="layer l-lake">
+          <div class="layer-label">
+            <div class="layer-num">2</div>
+            <div><h3>Data Lakehouse</h3><p>Bronze → Silver → Gold medallion zones</p></div>
+          </div>
+          <div class="comps">
+            <span class="comp comp-hl">Medallion Architecture</span>
+            <span class="comp">ACID Table Format</span>
+            <span class="comp">Time-Travel & Versioning</span>
+            <span class="comp">Unified Governance Catalog</span>
+            <span class="comp">Object Storage Tier</span>
+          </div>
+        </div>
+        <div class="flow-connector">↑</div>
+
+        <!-- L1: Source Integration -->
+        <div class="layer l-ingest">
+          <div class="layer-label">
+            <div class="layer-num">1</div>
+            <div><h3>Source Integration</h3><p>Ministry connectors, CDC, streaming, batch</p></div>
+          </div>
+          <div class="comps">
+            <span class="comp">Civil & Identity APIs</span>
+            <span class="comp">Health Events (FHIR)</span>
+            <span class="comp">Education Feeds</span>
+            <span class="comp">Labor & Wage CDC</span>
+            <span class="comp">Finance / Payments</span>
+            <span class="comp">CSR Upload Portal</span>
+          </div>
+        </div>
+
+      </div><!-- /stack -->
+    </div>
+
+    <!-- ═══ RIGHT PANEL: ML Middleware & Intelligence ═══ -->
+    <div class="panel">
+      <div class="panel-title">Intelligence Middleware</div>
+
+      <div class="mw-card">
+        <h4>⚙️ Configurable ML Middleware</h4>
+        <p>The scalable middleware layer that transforms raw demographic data into ML-ready feature vectors. All parameters are configurable and extensible without code changes.</p>
+        <div class="mw-tags">
+          <span class="mw-tag">Pluggable</span>
+          <span class="mw-tag">Scalable</span>
+          <span class="mw-tag">Configurable</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h4 style="color:var(--amber);">🎯 Segmentation Parameters</h4>
+        <ul class="info-list">
+          <li><span>Age Group Clusters</span> <span class="val">[0–5, 6–18, 19–35, 36–64, 65+]</span></li>
+          <li><span>Poverty / BPL Index</span> <span class="val">Composite Score 0.0–1.0</span></li>
+          <li><span>Location (Wilayat)</span> <span class="val">Geospatial Hash Grid</span></li>
+          <li><span>Household Size</span> <span class="val">Dependency Ratio</span></li>
+          <li><span>Income Proxy</span> <span class="val">Wage + Benefits</span></li>
+          <li><span>Disability Status</span> <span class="val">Categorical Flag</span></li>
+          <li><span>Student Status</span> <span class="val">Enrollment Binary</span></li>
+          <li><span>Employment Status</span> <span class="val">Employed / Unemployed</span></li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h4 style="color:var(--violet);">🧠 ML Model Inventory</h4>
+        <ul class="info-list">
+          <li><span>Household Similarity</span> <span class="val">K-Means Clustering</span></li>
+          <li><span>Need Prioritization</span> <span class="val">LTR Ranking</span></li>
+          <li><span>Vulnerability Proxy</span> <span class="val">XGBoost Regression</span></li>
+          <li><span>Benefit Leakage</span> <span class="val">Anomaly Detection</span></li>
+          <li><span>Early Warning</span> <span class="val">Time-Series Classifier</span></li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h4 style="color:var(--blue);">📚 RAG Knowledge Base</h4>
+        <ul class="info-list">
+          <li><span>Policy Documents</span> <span class="val">Vector Indexed</span></li>
+          <li><span>Eligibility Rules</span> <span class="val">Feature Store Lookup</span></li>
+          <li><span>Grant Availability</span> <span class="val">Real-time Lakehouse</span></li>
+          <li><span>CSR Guidelines</span> <span class="val">Embedded Corpus</span></li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /arch-grid -->
+
+  <!-- ═══════════ SECURITY STRIP ═══════════ -->
+  <div class="section-hdr">Sovereign Security & Governance (Cross-Cutting)</div>
+
+  <div class="sec-footer">
+    <div class="sec-grid">
+      <div class="sec-domain">
+        <div class="sec-icon">🔐</div>
+        <h5>Identity & Access</h5>
+        <p>SSO · MFA · RBAC + ABAC · Service Identities · JIT Elevation</p>
+      </div>
+      <div class="sec-domain">
+        <div class="sec-icon">🔑</div>
+        <h5>Encryption & Keys</h5>
+        <p>TLS 1.3 Transit · AES-256 Rest · Sovereign CMK · Domain Separation</p>
+      </div>
+      <div class="sec-domain">
+        <div class="sec-icon">🛡️</div>
+        <h5>Data Protection</h5>
+        <p>PII Tokenization · Column Masking · Row-Level Security · 4-Tier Classification</p>
+      </div>
+      <div class="sec-domain">
+        <div class="sec-icon">🤖</div>
+        <h5>AI Safety</h5>
+        <p>No Raw PII to LLMs · Governed Tools Only · Prompt Filtering · HITL Gates</p>
+      </div>
+      <div class="sec-domain">
+        <div class="sec-icon">📋</div>
+        <h5>Audit & Lineage</h5>
+        <p>Immutable Logs · Full Decision Trail · Model Provenance · Lineage Graph</p>
+      </div>
+      <div class="sec-domain">
+        <div class="sec-icon">🏛️</div>
+        <h5>Compliance</h5>
+        <p>100% Data Residency (Oman) · Oman DPL · Segregation of Duties · Retention</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ END-TO-END FLOW ═══════════ -->
+  <div class="section-hdr">End-to-End Decision Flow</div>
+
+  <div class="flow-strip">
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="fs-num">📥</div>
+        <h5>Ingest</h5>
+        <p>Ministry data lands via APIs, CDC, batch</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">🧹</div>
+        <h5>Cleanse</h5>
+        <p>DQ gates, schema validation, quarantine</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">🔗</div>
+        <h5>Resolve</h5>
+        <p>Entity matching, household graph build</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">🧬</div>
+        <h5>Featurize</h5>
+        <p>Poverty index, age clusters, geo-hash</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">🧠</div>
+        <h5>Score & Cluster</h5>
+        <p>ML models rank, cluster, and classify</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">💬</div>
+        <h5>Serve & Chat</h5>
+        <p>Dashboards, APIs, AI assistant answers</p>
+      </div>
+      <div class="flow-step">
+        <div class="fs-num">✅</div>
+        <h5>Decide & Deliver</h5>
+        <p>HITL approval → grant disbursement</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ USE CASES ═══════════ -->
+  <div class="section-hdr">Core Grant & Facility Programs</div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+    <div class="info-card" style="border-left: 3px solid var(--blue);">
+      <h4 style="color: var(--blue);">🎓 Student Transport Grant</h4>
+      <ul class="info-list">
+        <li><span>Amount</span> <span class="val">50 OMR/month</span></li>
+        <li><span>Trigger</span> <span class="val">Enrollment Verified</span></li>
+        <li><span>Frequency</span> <span class="val">Monthly Batch</span></li>
+        <li><span>Approval</span> <span class="val">Auto + Spot-Check</span></li>
+      </ul>
+    </div>
+    <div class="info-card" style="border-left: 3px solid var(--teal);">
+      <h4 style="color: var(--teal);">👶 Newborn Baby Facility</h4>
+      <ul class="info-list">
+        <li><span>Trigger</span> <span class="val">Birth Event (FHIR)</span></li>
+        <li><span>Linkage</span> <span class="val">Parent → Household</span></li>
+        <li><span>Frequency</span> <span class="val">Event-Driven</span></li>
+        <li><span>Approval</span> <span class="val">Auto / Manual Review</span></li>
+      </ul>
+    </div>
+    <div class="info-card" style="border-left: 3px solid var(--amber);">
+      <h4 style="color: var(--amber);">🍞 BPL Food Support</h4>
+      <ul class="info-list">
+        <li><span>Eligibility</span> <span class="val">Poverty Index &lt; 0.4</span></li>
+        <li><span>Segments</span> <span class="val">Elderly · Disabled · Large HH</span></li>
+        <li><span>Frequency</span> <span class="val">Monthly Allocation</span></li>
+        <li><span>Approval</span> <span class="val">Policy Rule + HITL</span></li>
+      </ul>
+    </div>
+    <div class="info-card" style="border-left: 3px solid var(--emerald);">
+      <h4 style="color: var(--emerald);">🏢 CSR Fund Allocation</h4>
+      <ul class="info-list">
+        <li><span>Input</span> <span class="val">Budget + Arabic Query</span></li>
+        <li><span>AI Action</span> <span class="val">Segment Ranking via RAG</span></li>
+        <li><span>Output</span> <span class="val">Ranked Options + Justify</span></li>
+        <li><span>Approval</span> <span class="val">Mandatory Human Review</span></li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANED — Full-Stack Social Protection Platform</title>
+<meta name="description" content="Complete architecture from CoreX GPU infrastructure through Data Lakehouse, MLOps, and Agentic AI">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:    #04060c;
+    --bg-base:    #0a0e1a;
+    --bg-surface: #111828;
+    --bg-raised:  #17203a;
+    --bg-hover:   #1e2a4a;
+
+    --border-dim:    rgba(255,255,255,0.06);
+    --border-subtle: rgba(255,255,255,0.10);
+    --border-accent: rgba(255,255,255,0.16);
+
+    --text-primary:   #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted:     #64748b;
+
+    /* Platform palette */
+    --teal:     #14b8a6;
+    --teal-dim: rgba(20,184,166,0.12);
+    --blue:     #3b82f6;
+    --blue-dim: rgba(59,130,246,0.12);
+    --amber:    #f59e0b;
+    --amber-dim:rgba(245,158,11,0.10);
+    --rose:     #f43f5e;
+    --rose-dim: rgba(244,63,94,0.10);
+    --emerald:  #10b981;
+    --emerald-dim: rgba(16,185,129,0.10);
+    --violet:   #8b5cf6;
+    --violet-dim:rgba(139,92,246,0.10);
+    --cyan:     #06b6d4;
+    --cyan-dim: rgba(6,182,212,0.10);
+    --orange:   #f97316;
+    --orange-dim:rgba(249,115,22,0.10);
+    --lime:     #84cc16;
+    --lime-dim: rgba(132,204,22,0.10);
+    --steel:    #475569;
+    --steel-dim:rgba(71,85,105,0.15);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg-void);
+    color: var(--text-primary);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .canvas-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 55% 35% at 20% 90%, rgba(249,115,22,0.05) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 80% 15%, rgba(20,184,166,0.05) 0%, transparent 70%),
+      linear-gradient(rgba(255,255,255,0.013) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.013) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 44px 44px, 44px 44px;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 1560px; margin: 0 auto; padding: 36px 40px 80px; }
+
+  /* ─── MASTHEAD ─── */
+  .masthead {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 1px solid var(--border-dim); padding-bottom: 24px; margin-bottom: 32px;
+  }
+  .masthead h1 { font-size: 40px; font-weight: 900; letter-spacing: -0.8px; line-height: 1.1; }
+  .masthead h1 .ar { font-family: 'Noto Kufi Arabic', sans-serif; font-weight: 700; color: var(--teal); font-size: 30px; margin-left: 12px; }
+  .masthead .sub { color: var(--text-secondary); font-size: 13.5px; margin-top: 6px; max-width: 640px; line-height: 1.5; }
+  .badge-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .badge {
+    padding: 5px 12px; border-radius: 16px; font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; white-space: nowrap;
+  }
+  .b-gov  { background: var(--teal-dim);   border: 1px solid rgba(20,184,166,0.3);  color: var(--teal); }
+  .b-core { background: var(--orange-dim); border: 1px solid rgba(249,115,22,0.3);  color: var(--orange); }
+  .b-ai   { background: var(--violet-dim); border: 1px solid rgba(139,92,246,0.3);  color: var(--violet); }
+
+  /* ─── SECTION DIVIDERS ─── */
+  .zone-header {
+    display: flex; align-items: center; gap: 14px;
+    margin: 36px 0 16px; padding-left: 2px;
+  }
+  .zone-chip {
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;
+    padding: 5px 14px; border-radius: 14px; white-space: nowrap;
+  }
+  .zone-chip.zc-corex { background: var(--orange-dim); border: 1px solid rgba(249,115,22,0.25); color: var(--orange); }
+  .zone-chip.zc-lake  { background: var(--blue-dim);   border: 1px solid rgba(59,130,246,0.25);  color: var(--blue); }
+  .zone-chip.zc-intel  { background: var(--violet-dim); border: 1px solid rgba(139,92,246,0.25); color: var(--violet); }
+  .zone-chip.zc-agent  { background: var(--teal-dim);   border: 1px solid rgba(20,184,166,0.25); color: var(--teal); }
+  .zone-chip.zc-sec   { background: var(--rose-dim);   border: 1px solid rgba(244,63,94,0.25);  color: var(--rose); }
+  .zone-line { flex: 1; height: 1px; background: var(--border-dim); }
+  .zone-desc { font-size: 11px; color: var(--text-muted); }
+
+  /* ─── CONNECTOR ARROWS ─── */
+  .connector {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 8px 0; color: var(--text-muted); font-size: 10px; letter-spacing: 1px;
+    text-transform: uppercase; font-weight: 600; opacity: 0.5;
+  }
+  .connector::before, .connector::after { content: ''; flex: 0.3; height: 1px; background: var(--border-dim); }
+  .connector .arr { font-size: 18px; opacity: 0.6; }
+
+  /* ─── CARD GRID ─── */
+  .card-grid { display: grid; gap: 14px; }
+  .g2 { grid-template-columns: 1fr 1fr; }
+  .g3 { grid-template-columns: 1fr 1fr 1fr; }
+  .g4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .g5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+
+  .card {
+    background: var(--bg-surface); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-md); padding: 20px; position: relative; overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .card:hover { border-color: var(--border-accent); box-shadow: 0 0 24px rgba(255,255,255,0.03); }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .card-icon { font-size: 24px; margin-bottom: 10px; }
+  .card h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .card p { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* Card accent bars */
+  .c-orange .card::before { background: linear-gradient(90deg, var(--orange), transparent); opacity: 0.5; }
+  .c-blue   .card::before { background: linear-gradient(90deg, var(--blue), transparent); opacity: 0.5; }
+  .c-violet .card::before { background: linear-gradient(90deg, var(--violet), transparent); opacity: 0.5; }
+  .c-teal   .card::before { background: linear-gradient(90deg, var(--teal), transparent); opacity: 0.5; }
+  .c-rose   .card::before { background: linear-gradient(90deg, var(--rose), transparent); opacity: 0.5; }
+  .c-amber  .card::before { background: linear-gradient(90deg, var(--amber), transparent); opacity: 0.5; }
+  .c-emerald .card::before { background: linear-gradient(90deg, var(--emerald), transparent); opacity: 0.5; }
+
+  /* Tag strip inside cards */
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+  .tag {
+    background: rgba(0,0,0,0.35); border: 1px solid var(--border-dim);
+    padding: 3px 10px; border-radius: 10px; font-size: 9px; font-weight: 600;
+    color: var(--text-secondary); white-space: nowrap;
+  }
+  .tag-hl { border-color: rgba(249,115,22,0.3); color: var(--orange); }
+  .tag-teal { border-color: rgba(20,184,166,0.3); color: var(--teal); }
+  .tag-violet { border-color: rgba(139,92,246,0.3); color: var(--violet); }
+  .tag-blue { border-color: rgba(59,130,246,0.3); color: var(--blue); }
+
+  /* ─── COREX HIGHLIGHT BOX ─── */
+  .corex-banner {
+    background: linear-gradient(135deg, rgba(249,115,22,0.06) 0%, rgba(139,92,246,0.04) 100%);
+    border: 1px solid rgba(249,115,22,0.15); border-radius: var(--radius-lg);
+    padding: 24px 28px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .corex-banner .cb-logo {
+    font-size: 28px; font-weight: 900; color: var(--orange);
+    font-family: 'JetBrains Mono', monospace; white-space: nowrap;
+  }
+  .corex-banner .cb-logo span { color: var(--text-muted); font-weight: 400; font-size: 13px; }
+  .corex-banner p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ─── FULL FLOW STRIP ─── */
+  .flow-full {
+    background: var(--bg-surface); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg); padding: 28px; margin-top: 36px;
+  }
+  .flow-full h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 18px; }
+  .flow-pipe { display: grid; grid-template-columns: repeat(9, 1fr); gap: 8px; }
+  .f-step {
+    text-align: center; padding: 14px 6px;
+    background: var(--bg-raised); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-sm); position: relative;
+  }
+  .f-step::after {
+    content: '→'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 12px; opacity: 0.35;
+  }
+  .f-step:last-child::after { content: none; }
+  .f-step .fs-i { font-size: 20px; margin-bottom: 4px; }
+  .f-step h5 { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .f-step p  { font-size: 8px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Color coded flow step borders */
+  .fs-orange { border-bottom: 2px solid var(--orange); }
+  .fs-blue   { border-bottom: 2px solid var(--blue); }
+  .fs-violet { border-bottom: 2px solid var(--violet); }
+  .fs-teal   { border-bottom: 2px solid var(--teal); }
+
+  /* ─── SECURITY FOOTER ─── */
+  .sec-strip {
+    background: var(--bg-surface); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-lg); padding: 24px; position: relative; overflow: hidden;
+  }
+  .sec-strip::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--rose), var(--amber), var(--teal), var(--violet)); opacity: 0.4;
+  }
+  .sec-strip h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 16px; }
+  .sec-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+  .s-cell {
+    background: var(--bg-raised); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-sm); padding: 12px; text-align: center;
+    transition: border-color 0.3s;
+  }
+  .s-cell:hover { border-color: var(--rose); }
+  .s-cell .si { font-size: 18px; margin-bottom: 5px; }
+  .s-cell h5 { font-size: 10px; font-weight: 700; margin-bottom: 3px; }
+  .s-cell p  { font-size: 8.5px; color: var(--text-muted); line-height: 1.3; }
+
+  /* ─── USE CASES STRIP ─── */
+  .uc-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 16px; }
+  .uc-card {
+    background: var(--bg-surface); border: 1px solid var(--border-dim);
+    border-radius: var(--radius-md); padding: 18px; border-left: 3px solid;
+  }
+  .uc-card h4 { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+  .uc-card p  { font-size: 10px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1200px) {
+    .g4, .g5 { grid-template-columns: repeat(2, 1fr); }
+    .flow-pipe { grid-template-columns: repeat(5, 1fr); }
+    .sec-row { grid-template-columns: repeat(3, 1fr); }
+    .uc-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .page { padding: 20px; }
+    .masthead { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .g2, .g3, .g4, .g5 { grid-template-columns: 1fr; }
+    .flow-pipe { grid-template-columns: repeat(3, 1fr); }
+    .sec-row { grid-template-columns: repeat(2, 1fr); }
+    .uc-grid { grid-template-columns: 1fr; }
+    .corex-banner { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="canvas-bg"></div>
+
+<div class="page">
+
+<!-- ═══════════════════════════════════════════════════════
+     MASTHEAD
+     ═══════════════════════════════════════════════════════ -->
+<header class="masthead">
+  <div>
+    <h1>SANED <span class="ar">سانِد</span></h1>
+    <p class="sub">National Social Protection & Welfare Intelligence Platform — Full-stack sovereign architecture from GPU-accelerated infrastructure through Data Lakehouse, MLOps, and Agentic AI for equitable grant delivery across the Sultanate of Oman.</p>
+  </div>
+  <div class="badge-row">
+    <span class="badge b-core">CoreX Infrastructure</span>
+    <span class="badge b-ai">Lakehouse + MLOps</span>
+    <span class="badge b-gov">Sovereign Agentic AI</span>
+  </div>
+</header>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TIER 1 — COREX INFRASTRUCTURE (Bottom Foundation)
+     ═══════════════════════════════════════════════════════ -->
+<div class="zone-header">
+  <span class="zone-chip zc-corex">Tier 1 — CoreX Infrastructure</span>
+  <span class="zone-line"></span>
+  <span class="zone-desc">Sovereign Hardware, Networking & GPU Compute Foundation</span>
+</div>
+
+<div class="corex-banner">
+  <div class="cb-logo">CoreX<span> Platform</span></div>
+  <p>The sovereign on-premise infrastructure platform providing GPU-accelerated compute, enterprise networking, and containerized model hosting. CoreX provisions and manages all hardware resources, ensuring 100% data sovereignty with in-country processing and zero external dependency for model inference.</p>
+</div>
+
+<div class="card-grid g4 c-orange">
+  <div class="card">
+    <div class="card-icon">🖥️</div>
+    <h3>Hardware & Compute</h3>
+    <p>Sovereign bare-metal and VM compute pools for ETL, ML training, and inference workloads. Auto-scaling resource allocation.</p>
+    <div class="tags">
+      <span class="tag tag-hl">Bare-Metal Servers</span>
+      <span class="tag tag-hl">VM Clusters</span>
+      <span class="tag">IPMI / BMC</span>
+      <span class="tag">Auto-Scale</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">🌐</div>
+    <h3>Network Fabric</h3>
+    <p>High-throughput, low-latency data center networking with microsegmentation, east-west encryption, and ministry peering.</p>
+    <div class="tags">
+      <span class="tag tag-hl">SDN Fabric</span>
+      <span class="tag tag-hl">100G Spine-Leaf</span>
+      <span class="tag">VxLAN Overlay</span>
+      <span class="tag">Zero-Trust Zones</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">⚡</div>
+    <h3>GPU Accelerators</h3>
+    <p>Dedicated GPU pools for LLM inference, ML model training, embedding generation, and vector computation at scale.</p>
+    <div class="tags">
+      <span class="tag tag-hl">NVIDIA A100 / H100</span>
+      <span class="tag tag-hl">Multi-GPU Clusters</span>
+      <span class="tag">CUDA Runtime</span>
+      <span class="tag">vGPU Sharing</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">💾</div>
+    <h3>Storage Fabric</h3>
+    <p>High-performance distributed storage for data lake, model artifacts, vector indices, and checkpoints.</p>
+    <div class="tags">
+      <span class="tag tag-hl">Object Storage (S3-API)</span>
+      <span class="tag">NVMe Flash Tier</span>
+      <span class="tag">Block Storage</span>
+      <span class="tag">Erasure Coding</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TIER 2 — COREX PLATFORM SERVICES
+     ═══════════════════════════════════════════════════════ -->
+<div class="connector"><span class="arr">▲</span> CoreX Platform Services <span class="arr">▲</span></div>
+
+<div class="zone-header">
+  <span class="zone-chip zc-corex">Tier 2 — CoreX Platform Services</span>
+  <span class="zone-line"></span>
+  <span class="zone-desc">LLM Orchestration, Docker Provisioning, API Management & Training Pipelines</span>
+</div>
+
+<div class="card-grid g4 c-orange">
+  <div class="card">
+    <div class="card-icon">🎛️</div>
+    <h3>LLM Orchestrator</h3>
+    <p>Centralized routing engine that selects, loads, and chains multiple LLMs based on task type, latency requirements, and model capability.</p>
+    <div class="tags">
+      <span class="tag tag-hl">Model Router</span>
+      <span class="tag tag-hl">Chain-of-Thought</span>
+      <span class="tag">Fallback Logic</span>
+      <span class="tag">Context Manager</span>
+      <span class="tag">Load Balancer</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">🏗️</div>
+    <h3>ML Training Pipeline Manager</h3>
+    <p>End-to-end pipeline orchestration for data prep, feature extraction, experiment tracking, hyperparameter tuning, and model packaging.</p>
+    <div class="tags">
+      <span class="tag tag-hl">Experiment Tracker</span>
+      <span class="tag tag-hl">HPO Engine</span>
+      <span class="tag">DAG Scheduler</span>
+      <span class="tag">Checkpoint Mgmt</span>
+      <span class="tag">Model Packager</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">🔌</div>
+    <h3>LLM API Management</h3>
+    <p>Governed API gateway for all model endpoints — rate limiting, token metering, key rotation, usage analytics, and multi-tenant isolation.</p>
+    <div class="tags">
+      <span class="tag tag-hl">API Gateway</span>
+      <span class="tag tag-hl">Token Metering</span>
+      <span class="tag">Rate Limiter</span>
+      <span class="tag">Key Rotation</span>
+      <span class="tag">Audit Trail</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">🐳</div>
+    <h3>LLM Docker Provisioning</h3>
+    <p>Automated container lifecycle for model hosting — image builds, GPU assignment, scaling policies, health probes, and blue-green deployments.</p>
+    <div class="tags">
+      <span class="tag tag-hl">Container Registry</span>
+      <span class="tag tag-hl">GPU Scheduling</span>
+      <span class="tag">Auto-scale Pods</span>
+      <span class="tag">Blue-Green Deploy</span>
+      <span class="tag">Health Probes</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TIER 3 — DATA LAKEHOUSE
+     ═══════════════════════════════════════════════════════ -->
+<div class="connector"><span class="arr">▲</span> Data Plane <span class="arr">▲</span></div>
+
+<div class="zone-header">
+  <span class="zone-chip zc-lake">Tier 3 — SANED Data Lakehouse</span>
+  <span class="zone-line"></span>
+  <span class="zone-desc">Source Ingestion, Medallion Zones, ETL, Entity Resolution & Integrated Registry</span>
+</div>
+
+<div class="card-grid g5 c-blue">
+  <div class="card">
+    <div class="card-icon">📥</div>
+    <h3>Source Connectors</h3>
+    <p>Ministry APIs, health FHIR events, education feeds, labor CDC, finance batch, and CSR uploads.</p>
+    <div class="tags">
+      <span class="tag tag-blue">8+ Ministries</span>
+      <span class="tag">REST · SFTP · CDC</span>
+      <span class="tag">Kafka Streams</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">🥉</div>
+    <h3>Bronze Zone</h3>
+    <p>Immutable raw landing. Append-only, source-faithful, forensic audit. 7+ year retention.</p>
+    <div class="tags">
+      <span class="tag tag-blue">Append-Only</span>
+      <span class="tag">JSON / CSV / Parquet</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">🥈</div>
+    <h3>Silver Zone</h3>
+    <p>Cleansed, validated, entity-resolved. DQ gates, quarantine, schema evolution. ACID upserts.</p>
+    <div class="tags">
+      <span class="tag tag-blue">Entity Resolved</span>
+      <span class="tag">DQ Validated</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">🥇</div>
+    <h3>Gold Zone</h3>
+    <p>Analytics-ready curated models. Historized registry of 14 core entities. Feature-ready tables.</p>
+    <div class="tags">
+      <span class="tag tag-blue">Golden Records</span>
+      <span class="tag">14 Core Entities</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">📚</div>
+    <h3>Governance Catalog</h3>
+    <p>Unified metadata — lineage, classification, permissions, retention, and schema contracts.</p>
+    <div class="tags">
+      <span class="tag tag-blue">Lineage Graph</span>
+      <span class="tag">RBAC + ABAC</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TIER 4 — INTELLIGENCE & MLOPS
+     ═══════════════════════════════════════════════════════ -->
+<div class="connector"><span class="arr">▲</span> Intelligence Plane <span class="arr">▲</span></div>
+
+<div class="zone-header">
+  <span class="zone-chip zc-intel">Tier 4 — Intelligence & MLOps</span>
+  <span class="zone-line"></span>
+  <span class="zone-desc">Feature Store, Auto ML, Model Training, Registry, Scoring & Drift Monitoring</span>
+</div>
+
+<div class="card-grid g3 c-violet">
+  <div class="card">
+    <div class="card-icon">🧬</div>
+    <h3>Feature Store & Middleware</h3>
+    <p>Scalable, configurable segmentation layer. Transforms raw demographics into ML-ready vectors. All parameters pluggable without code changes.</p>
+    <div class="tags">
+      <span class="tag tag-violet">Online + Offline Store</span>
+      <span class="tag tag-violet">Configurable Params</span>
+      <span class="tag">Age-Group Encoder</span>
+      <span class="tag">Poverty Index</span>
+      <span class="tag">Geo-Hasher</span>
+      <span class="tag">Household Graph</span>
+      <span class="tag">Temporal Windows</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">🧠</div>
+    <h3>AutoML & Model Training</h3>
+    <p>Automated baseline models + custom training on sovereign GPUs (CoreX). Experiment tracking, hyperparameter optimization, fairness audits.</p>
+    <div class="tags">
+      <span class="tag tag-violet">AutoML Baselines</span>
+      <span class="tag tag-violet">Custom GPU Training</span>
+      <span class="tag">SHAP Explainability</span>
+      <span class="tag">Fairness Audit</span>
+      <span class="tag">Cross-Validation</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">📦</div>
+    <h3>Model Registry & Governance</h3>
+    <p>Version management, stage transitions (Dev→Staging→Prod), model cards, governance gate (review board approval), drift monitoring, auto-retrain triggers.</p>
+    <div class="tags">
+      <span class="tag tag-violet">Model Registry</span>
+      <span class="tag tag-violet">Governance Gate</span>
+      <span class="tag">Canary Rollout</span>
+      <span class="tag">Drift Detection</span>
+      <span class="tag">A/B Testing</span>
+    </div>
+  </div>
+</div>
+
+<!-- ML Model Inventory -->
+<div class="card-grid g5 c-violet" style="margin-top: 14px;">
+  <div class="card" style="text-align:center;">
+    <div class="card-icon">🔍</div>
+    <h3>Household Similarity</h3>
+    <p>K-Means clustering for population segmentation</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div class="card-icon">📊</div>
+    <h3>Need Prioritization</h3>
+    <p>Learning-to-Rank for CSR allocation targeting</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div class="card-icon">⚠️</div>
+    <h3>Vulnerability Proxy</h3>
+    <p>XGBoost regression for poverty estimation</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div class="card-icon">🚨</div>
+    <h3>Benefit Leakage</h3>
+    <p>Anomaly detection for fraud and duplication</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div class="card-icon">📡</div>
+    <h3>Early Warning</h3>
+    <p>Time-series classifier for unmet needs alerts</p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     TIER 5 — AGENTIC AI PLATFORM
+     ═══════════════════════════════════════════════════════ -->
+<div class="connector"><span class="arr">▲</span> AI Experience Plane <span class="arr">▲</span></div>
+
+<div class="zone-header">
+  <span class="zone-chip zc-agent">Tier 5 — Agentic AI & Serving</span>
+  <span class="zone-line"></span>
+  <span class="zone-desc">Arabic/English Conversational AI, Agent Builder, RAG, Dashboards & APIs</span>
+</div>
+
+<div class="card-grid g3 c-teal">
+  <div class="card">
+    <div class="card-icon">🤖</div>
+    <h3>Agent Orchestration Engine</h3>
+    <p>Multi-agent router that decomposes user intents into tool-calling chains. Supports Arabic-first queries, conversation memory, and task sequencing.</p>
+    <div class="tags">
+      <span class="tag tag-teal">Multi-Agent Router</span>
+      <span class="tag tag-teal">Arabic / English NLU</span>
+      <span class="tag">Conversation Memory</span>
+      <span class="tag">Intent Classifier</span>
+      <span class="tag">Chain-of-Thought</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">🔧</div>
+    <h3>Agent Builder (No-Code)</h3>
+    <p>Visual agent configuration. Define tools, guardrails, retrieval sources, prompts, and approval workflows. Pre-built agents for eligibility, CSR, and coverage analysis.</p>
+    <div class="tags">
+      <span class="tag tag-teal">Drag-and-Drop Builder</span>
+      <span class="tag">6 Pre-built Agents</span>
+      <span class="tag">Custom Guardrails</span>
+      <span class="tag">Tool Registry</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-icon">📚</div>
+    <h3>RAG & Vector Search</h3>
+    <p>Policy documents, eligibility criteria, and CSR guidelines indexed as vectors. Real-time sync from Gold zone. Feature Store lookup for citizen context.</p>
+    <div class="tags">
+      <span class="tag tag-teal">Vector Index (Auto-Sync)</span>
+      <span class="tag tag-teal">Policy RAG Corpus</span>
+      <span class="tag">Hybrid Search</span>
+      <span class="tag">Reranking</span>
+    </div>
+  </div>
+</div>
+
+<!-- Serving & Output Channels -->
+<div class="card-grid g4 c-teal" style="margin-top: 14px;">
+  <div class="card" style="text-align:center;">
+    <div class="card-icon">💬</div>
+    <h3>AI Chat (AR/EN)</h3>
+    <p>Bilingual conversational interface for citizens, CSR, and officers</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div class="card-icon">📊</div>
+    <h3>BI Dashboards</h3>
+    <p>Coverage, utilization, equity, and segmentation analytics</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div class="card-icon">🔌</div>
+    <h3>REST / GraphQL APIs</h3>
+    <p>Governed endpoints for downstream system integration</p>
+  </div>
+  <div class="card" style="text-align:center;">
+    <div class="card-icon">📱</div>
+    <h3>Mobile PWA</h3>
+    <p>Progressive web app for citizen access and status tracking</p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     FULL-STACK DECISION FLOW
+     ═══════════════════════════════════════════════════════ -->
+<div class="flow-full">
+  <h3>End-to-End Decision Flow — CoreX → Lakehouse → ML → Agent → Grant Delivery</h3>
+  <div class="flow-pipe">
+    <div class="f-step fs-orange">
+      <div class="fs-i">🖥️</div>
+      <h5>CoreX Provision</h5>
+      <p>GPU + Container spin-up</p>
+    </div>
+    <div class="f-step fs-orange">
+      <div class="fs-i">🐳</div>
+      <h5>Model Deploy</h5>
+      <p>LLM Docker provision</p>
+    </div>
+    <div class="f-step fs-blue">
+      <div class="fs-i">📥</div>
+      <h5>Data Ingest</h5>
+      <p>Ministry API + CDC</p>
+    </div>
+    <div class="f-step fs-blue">
+      <div class="fs-i">🧹</div>
+      <h5>ETL & Resolve</h5>
+      <p>DQ → Entity match</p>
+    </div>
+    <div class="f-step fs-violet">
+      <div class="fs-i">🧬</div>
+      <h5>Featurize</h5>
+      <p>Poverty index + clusters</p>
+    </div>
+    <div class="f-step fs-violet">
+      <div class="fs-i">🧠</div>
+      <h5>Score & Rank</h5>
+      <p>ML models classify</p>
+    </div>
+    <div class="f-step fs-teal">
+      <div class="fs-i">💬</div>
+      <h5>Serve & Chat</h5>
+      <p>Agent answers query</p>
+    </div>
+    <div class="f-step fs-teal">
+      <div class="fs-i">👤</div>
+      <h5>HITL Review</h5>
+      <p>Human approval gate</p>
+    </div>
+    <div class="f-step fs-teal">
+      <div class="fs-i">✅</div>
+      <h5>Grant Deliver</h5>
+      <p>Disbursement action</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECURITY & GOVERNANCE (Cross-Cutting)
+     ═══════════════════════════════════════════════════════ -->
+<div class="zone-header">
+  <span class="zone-chip zc-sec">Cross-Cutting — Sovereign Security & Governance</span>
+  <span class="zone-line"></span>
+</div>
+
+<div class="sec-strip">
+  <h3>Pervasive Security — Every Tier, Every Transaction</h3>
+  <div class="sec-row">
+    <div class="s-cell">
+      <div class="si">🔐</div>
+      <h5>Identity & Access</h5>
+      <p>SSO · MFA · RBAC + ABAC · JIT Admin · Service IDs</p>
+    </div>
+    <div class="s-cell">
+      <div class="si">🔑</div>
+      <h5>Encryption & CMK</h5>
+      <p>TLS 1.3 · AES-256 · Sovereign Keys · Domain Separation</p>
+    </div>
+    <div class="s-cell">
+      <div class="si">🛡️</div>
+      <h5>Data Protection</h5>
+      <p>PII Tokenization · Column Masking · Row-Level Security</p>
+    </div>
+    <div class="s-cell">
+      <div class="si">🤖</div>
+      <h5>AI Safety</h5>
+      <p>No Raw PII → LLMs · Governed Tools · Prompt Audit</p>
+    </div>
+    <div class="s-cell">
+      <div class="si">📋</div>
+      <h5>Audit & Lineage</h5>
+      <p>Immutable Logs · Decision Trail · Model Provenance</p>
+    </div>
+    <div class="s-cell">
+      <div class="si">🏛️</div>
+      <h5>Compliance</h5>
+      <p>100% Oman Data Residency · DPL · Segregation of Duties</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     USE CASES
+     ═══════════════════════════════════════════════════════ -->
+<div class="zone-header">
+  <span class="zone-chip zc-agent">Core Programs & Facilities</span>
+  <span class="zone-line"></span>
+</div>
+
+<div class="uc-grid">
+  <div class="uc-card" style="border-left-color: var(--blue);">
+    <h4 style="color:var(--blue);">🎓 Student Transport Grant</h4>
+    <p>50 OMR/month per verified enrolled student. Monthly batch eligibility based on residence, institution, and household context.</p>
+  </div>
+  <div class="uc-card" style="border-left-color: var(--teal);">
+    <h4 style="color:var(--teal);">👶 Newborn Baby Facility</h4>
+    <p>Event-driven trigger from FHIR birth records. Auto-links to guardian household. Support queued for approval or auto-action.</p>
+  </div>
+  <div class="uc-card" style="border-left-color: var(--amber);">
+    <h4 style="color:var(--amber);">🍞 BPL Food Support</h4>
+    <p>Monthly allocation for households with poverty index &lt; 0.4. Prioritizes elderly, disabled, and large-dependency families.</p>
+  </div>
+  <div class="uc-card" style="border-left-color: var(--emerald);">
+    <h4 style="color:var(--emerald);">🏢 CSR Fund Allocation</h4>
+    <p>AI-guided budget targeting. CSR managers ask in Arabic → system ranks segments by need, geography, and unmet coverage. Mandatory HITL approval.</p>
+  </div>
+</div>
+
+
+</div><!-- /page -->
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASI — Lakehouse Zones</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--card:#131a2e;--border:rgba(255,255,255,.06);--text:#f1f5f9;--muted:#64748b;--bronze:#cd7f32;--silver:#c0c0c0;--gold:#ffd700;--teal:#2dd4bf;--rose:#f43f5e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:48px 48px}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:40px 24px}
+.hdr{text-align:center;margin-bottom:44px}
+.hdr .tag{display:inline-block;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25);border-radius:100px;padding:5px 14px;font-size:11px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.hdr h1{font-size:30px;font-weight:800}
+.hdr p{color:var(--muted);font-size:14px;margin-top:6px}
+
+.zones{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;gap:0;align-items:stretch;margin-bottom:32px}
+.zone{border-radius:16px;border:2px solid;padding:24px;position:relative;transition:transform .3s,box-shadow .3s}
+.zone:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.zone h2{font-size:18px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.zone .sub{font-size:12px;margin-bottom:16px}
+.zone .badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.zone ul{list-style:none}
+.zone li{font-size:12px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:6px}
+.zone li:last-child{border-bottom:none}
+.zone li .icon{font-size:14px;width:20px;text-align:center}
+.zone .tech{margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06)}
+.zone .tech-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.zone .tech-items{display:flex;flex-wrap:wrap;gap:6px}
+.zone .tech-tag{padding:3px 10px;border-radius:6px;font-size:10px;font-weight:500;border:1px solid}
+
+/* Bronze */
+.z-bronze{border-color:rgba(205,127,50,.3);background:linear-gradient(180deg,rgba(205,127,50,.08) 0%,rgba(19,26,46,1) 100%)}
+.z-bronze h2{color:var(--bronze)}.z-bronze .sub{color:rgba(205,127,50,.6)}
+.z-bronze .badge{background:rgba(205,127,50,.15);color:var(--bronze)}
+.z-bronze .tech-tag{background:rgba(205,127,50,.08);border-color:rgba(205,127,50,.2);color:var(--bronze)}
+
+/* Silver */
+.z-silver{border-color:rgba(192,192,192,.3);background:linear-gradient(180deg,rgba(192,192,192,.06) 0%,rgba(19,26,46,1) 100%)}
+.z-silver h2{color:var(--silver)}.z-silver .sub{color:rgba(192,192,192,.6)}
+.z-silver .badge{background:rgba(192,192,192,.15);color:var(--silver)}
+.z-silver .tech-tag{background:rgba(192,192,192,.08);border-color:rgba(192,192,192,.2);color:var(--silver)}
+
+/* Gold */
+.z-gold{border-color:rgba(255,215,0,.3);background:linear-gradient(180deg,rgba(255,215,0,.06) 0%,rgba(19,26,46,1) 100%)}
+.z-gold h2{color:var(--gold)}.z-gold .sub{color:rgba(255,215,0,.6)}
+.z-gold .badge{background:rgba(255,215,0,.15);color:var(--gold)}
+.z-gold .tech-tag{background:rgba(255,215,0,.08);border-color:rgba(255,215,0,.2);color:var(--gold)}
+
+/* Arrows */
+.zone-arrow{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:22px;opacity:.4}
+
+/* Bottom sections */
+.bottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.panel{padding:20px;border-radius:14px;border:1px solid var(--border);background:var(--card)}
+.panel h3{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.panel table{width:100%;border-collapse:collapse;font-size:11px}
+.panel th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;font-size:10px}
+.panel td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.02);color:var(--muted)}
+.panel td:first-child{color:var(--text);font-weight:500}
+.q-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.q-raw{background:rgba(205,127,50,.1);color:var(--bronze)}
+.q-std{background:rgba(192,192,192,.1);color:var(--silver)}
+.q-cur{background:rgba(255,215,0,.1);color:var(--gold)}
+
+@media(max-width:900px){.zones{grid-template-columns:1fr;gap:12px}.zone-arrow{transform:rotate(90deg)}.bottom{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="wrap">
+<div class="hdr">
+<div class="tag">Data Storage Architecture</div>
+<h1>Lakehouse Storage Zones</h1>
+<p>Bronze → Silver → Gold medallion architecture with Delta Lake / Apache Iceberg</p>
+</div>
+
+<div class="zones">
+<!-- Bronze -->
+<div class="zone z-bronze">
+<div class="badge">Raw / Landing</div>
+<h2>🥉 Bronze Zone</h2>
+<div class="sub">Immutable source capture</div>
+<ul>
+<li><span class="icon">📥</span> Raw ingestion, append-only</li>
+<li><span class="icon">📁</span> Source-partitioned by origin</li>
+<li><span class="icon">🔒</span> AES-256, customer-managed keys</li>
+<li><span class="icon">📜</span> Full forensic traceability</li>
+<li><span class="icon">⏰</span> 7-year minimum retention</li>
+<li><span class="icon">📊</span> Ingestion metadata captured</li>
+<li><span class="icon">🏷️</span> Sensitivity labels applied</li>
+</ul>
+<div class="tech">
+<div class="tech-label">Technology</div>
+<div class="tech-items">
+<span class="tech-tag">S3 / ADLS Gen2</span>
+<span class="tech-tag">Delta Lake</span>
+<span class="tech-tag">Parquet</span>
+</div>
+</div>
+</div>
+
+<div class="zone-arrow">→</div>
+
+<!-- Silver -->
+<div class="zone z-silver">
+<div class="badge">Standardized / Validated</div>
+<h2>🥈 Silver Zone</h2>
+<div class="sub">Cleansed, deduplicated, resolved</div>
+<ul>
+<li><span class="icon">🧹</span> Schema-validated records</li>
+<li><span class="icon">🔗</span> Entity resolution applied</li>
+<li><span class="icon">👨‍👩‍👧</span> Household graphs built</li>
+<li><span class="icon">📐</span> Type-normalized columns</li>
+<li><span class="icon">🚫</span> Failed records quarantined</li>
+<li><span class="icon">🔄</span> SCD Type-2 historization</li>
+<li><span class="icon">📊</span> Lineage metadata emitted</li>
+</ul>
+<div class="tech">
+<div class="tech-label">Technology</div>
+<div class="tech-items">
+<span class="tech-tag">Apache Spark</span>
+<span class="tech-tag">Great Expectations</span>
+<span class="tech-tag">Delta Lake</span>
+</div>
+</div>
+</div>
+
+<div class="zone-arrow">→</div>
+
+<!-- Gold -->
+<div class="zone z-gold">
+<div class="badge">Curated / Serving</div>
+<h2>🥇 Gold Zone</h2>
+<div class="sub">Analytics-ready, governed marts</div>
+<ul>
+<li><span class="icon">⭐</span> Golden master entities</li>
+<li><span class="icon">📊</span> Subject-area data marts</li>
+<li><span class="icon">🧠</span> Feature store vectors</li>
+<li><span class="icon">🔒</span> Row/column level security</li>
+<li><span class="icon">📈</span> BI-optimized aggregations</li>
+<li><span class="icon">🔌</span> API-served endpoints</li>
+<li><span class="icon">📋</span> Governed catalog registered</li>
+</ul>
+<div class="tech">
+<div class="tech-label">Technology</div>
+<div class="tech-items">
+<span class="tech-tag">Unity Catalog</span>
+<span class="tech-tag">SQL Warehouse</span>
+<span class="tech-tag">Feature Store</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Bottom panels -->
+<div class="bottom">
+<div class="panel">
+<h3>📋 Zone Comparison</h3>
+<table>
+<tr><th>Property</th><th>Bronze</th><th>Silver</th><th>Gold</th></tr>
+<tr><td>Mutability</td><td><span class="q-raw">Append-only</span></td><td><span class="q-std">Upsert</span></td><td><span class="q-cur">Managed</span></td></tr>
+<tr><td>Latency</td><td>Minutes</td><td>Minutes-Hours</td><td>Sub-second</td></tr>
+<tr><td>Format</td><td>Raw (JSON,CSV,Parquet)</td><td>Delta/Iceberg</td><td>Delta/Iceberg</td></tr>
+<tr><td>Access</td><td>Data Engineers</td><td>Data Engineers</td><td>Analysts + APIs</td></tr>
+<tr><td>Security</td><td>Source-level ACL</td><td>Role-based</td><td>Row+Column ABAC</td></tr>
+<tr><td>Retention</td><td>7+ years</td><td>3 years</td><td>Active + 1 year</td></tr>
+</table>
+</div>
+
+<div class="panel">
+<h3>📊 Data Volume Estimates</h3>
+<table>
+<tr><th>Entity</th><th>Records</th><th>Growth/yr</th></tr>
+<tr><td>Person</td><td>~4.5M</td><td>+2%</td></tr>
+<tr><td>Household</td><td>~1.2M</td><td>+2%</td></tr>
+<tr><td>Life Events</td><td>~50M</td><td>+15%</td></tr>
+<tr><td>Eligibility Decisions</td><td>~20M</td><td>+25%</td></tr>
+<tr><td>Student Records</td><td>~800K</td><td>+3%</td></tr>
+<tr><td>Institutions</td><td>~5K</td><td>+5%</td></tr>
+<tr><td>Audit Events</td><td>~100M/yr</td><td>+30%</td></tr>
+</table>
+</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASI — AI Agentic Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--card:#131a2e;--border:rgba(255,255,255,.06);--text:#f1f5f9;--muted:#64748b;--teal:#2dd4bf;--blue:#3b82f6;--violet:#818cf8;--amber:#f59e0b;--emerald:#10b981;--cyan:#06b6d4;--orange:#f97316;--rose:#f43f5e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:48px 48px}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:40px 24px}
+.hdr{text-align:center;margin-bottom:44px}
+.hdr .tag{display:inline-block;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);border-radius:100px;padding:5px 14px;font-size:11px;font-weight:600;color:var(--orange);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.hdr h1{font-size:30px;font-weight:800}
+.hdr p{color:var(--muted);font-size:14px;margin-top:6px}
+
+/* Agent architecture */
+.arch{display:grid;grid-template-columns:1fr;gap:12px}
+.tier{border-radius:14px;border:1px solid var(--border);background:var(--card);padding:20px;position:relative;overflow:hidden}
+.tier::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+.tier .tier-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.tier h3{font-size:16px;font-weight:700;margin-bottom:12px}
+.tier-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.block{padding:12px 14px;border-radius:10px;border:1px solid;font-size:12px}
+.block .b-title{font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.block .b-desc{font-size:11px;opacity:.7}
+
+.t1::before{background:var(--orange)}.t1 .tier-label{color:var(--orange)}
+.t1 .block{background:rgba(249,115,22,.05);border-color:rgba(249,115,22,.15);color:#fdba74}
+
+.t2::before{background:var(--violet)}.t2 .tier-label{color:var(--violet)}
+.t2 .block{background:rgba(129,140,248,.05);border-color:rgba(129,140,248,.15);color:#a5b4fc}
+
+.t3::before{background:var(--emerald)}.t3 .tier-label{color:var(--emerald)}
+.t3 .block{background:rgba(16,185,129,.05);border-color:rgba(16,185,129,.15);color:#6ee7b7}
+
+.t4::before{background:var(--rose)}.t4 .tier-label{color:var(--rose)}
+.t4 .block{background:rgba(244,63,94,.05);border-color:rgba(244,63,94,.15);color:#fda4af}
+
+.t5::before{background:var(--cyan)}.t5 .tier-label{color:var(--cyan)}
+.t5 .block{background:rgba(6,182,212,.05);border-color:rgba(6,182,212,.15);color:#67e8f9}
+
+/* Agent flow */
+.flow-section{margin-top:32px}
+.flow-section h3{font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.flow-steps{display:flex;gap:0;overflow-x:auto;padding-bottom:8px}
+.step{flex:1;min-width:130px;padding:14px;border-radius:10px;background:var(--card);border:1px solid var(--border);text-align:center;position:relative}
+.step .s-num{font-size:10px;font-weight:700;color:var(--orange);margin-bottom:4px}
+.step .s-icon{font-size:22px;margin-bottom:6px}
+.step .s-title{font-size:12px;font-weight:600;margin-bottom:4px}
+.step .s-desc{font-size:10px;color:var(--muted)}
+.step-arrow{display:flex;align-items:center;justify-content:center;width:20px;color:var(--muted);opacity:.3;font-size:14px;flex-shrink:0}
+
+/* Agents table */
+.agents-table{margin-top:24px;padding:20px;border-radius:14px;border:1px solid var(--border);background:var(--card)}
+.agents-table h3{font-size:14px;font-weight:700;margin-bottom:12px}
+.agents-table table{width:100%;border-collapse:collapse;font-size:12px}
+.agents-table th{text-align:left;padding:8px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;font-size:10px}
+.agents-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,.02)}
+.agents-table td:first-child{font-weight:600}
+.a-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.a-auto{background:rgba(16,185,129,.1);color:var(--emerald)}
+.a-hitl{background:rgba(245,158,11,.1);color:var(--amber)}
+
+@media(max-width:768px){.tier-grid{grid-template-columns:1fr}.flow-steps{flex-direction:column}.step-arrow{transform:rotate(90deg);width:auto;height:20px}}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="wrap">
+<div class="hdr">
+<div class="tag">Agentic AI</div>
+<h1>AI Agentic Platform Architecture</h1>
+<p>Arabic/English conversational intelligence with governed tool-use and human-in-the-loop workflows</p>
+</div>
+
+<div class="arch">
+<div class="tier t1">
+<div class="tier-label">Presentation Layer</div>
+<h3>💬 User Interfaces</h3>
+<div class="tier-grid">
+<div class="block"><div class="b-title">🌐 Web Chat UI</div><div class="b-desc">Arabic-first RTL interface, English toggle, conversation history</div></div>
+<div class="block"><div class="b-title">📱 Mobile Interface</div><div class="b-desc">Responsive PWA for field operators and program staff</div></div>
+<div class="block"><div class="b-title">🔌 API Gateway</div><div class="b-desc">REST API for programmatic agent invocation</div></div>
+<div class="block"><div class="b-title">🔔 Notification Hub</div><div class="b-desc">Push alerts for approval requests and decisions</div></div>
+</div>
+</div>
+
+<div class="tier t2">
+<div class="tier-label">Orchestration Layer</div>
+<h3>🤖 Agent Orchestrator</h3>
+<div class="tier-grid">
+<div class="block"><div class="b-title">🧠 LangGraph Engine</div><div class="b-desc">Multi-agent DAG execution, state management, branching</div></div>
+<div class="block"><div class="b-title">🔀 Router Agent</div><div class="b-desc">Intent classification → specialist agent dispatch</div></div>
+<div class="block"><div class="b-title">💾 Conversation Memory</div><div class="b-desc">Session state, multi-turn context, user preferences</div></div>
+<div class="block"><div class="b-title">📋 Agent Builder</div><div class="b-desc">Admin-configured agents: prompts, tools, policies, guardrails</div></div>
+</div>
+</div>
+
+<div class="tier t3">
+<div class="tier-label">Tool & Knowledge Layer</div>
+<h3>🔧 Governed Tools & RAG</h3>
+<div class="tier-grid">
+<div class="block"><div class="b-title">🔍 Eligibility Lookup</div><div class="b-desc">Query rules engine for person/household eligibility</div></div>
+<div class="block"><div class="b-title">📊 Segment Query</div><div class="b-desc">Retrieve approved population segments</div></div>
+<div class="block"><div class="b-title">💰 CSR Allocator</div><div class="b-desc">Budget-constrained ranking and recommendation</div></div>
+<div class="block"><div class="b-title">📖 Policy RAG</div><div class="b-desc">Vector search over policy docs and regulations</div></div>
+<div class="block"><div class="b-title">🏥 Institution Query</div><div class="b-desc">Hospital/school capacity and support analysis</div></div>
+<div class="block"><div class="b-title">📈 Analytics Query</div><div class="b-desc">Governed SQL queries against curated marts</div></div>
+</div>
+</div>
+
+<div class="tier t4">
+<div class="tier-label">Safety & Governance Layer</div>
+<h3>🛡️ AI Guardrails</h3>
+<div class="tier-grid">
+<div class="block"><div class="b-title">🚫 Input Filter</div><div class="b-desc">Prompt injection, jailbreak, off-topic detection</div></div>
+<div class="block"><div class="b-title">🎭 PII Shield</div><div class="b-desc">Mask national IDs, sensitive fields in prompts/responses</div></div>
+<div class="block"><div class="b-title">🔒 Permission Gate</div><div class="b-desc">RBAC/ABAC enforcement per tool, per data scope</div></div>
+<div class="block"><div class="b-title">✋ Human-in-the-Loop</div><div class="b-desc">Approval workflow for high-impact recommendations</div></div>
+<div class="block"><div class="b-title">📜 Audit Logger</div><div class="b-desc">Immutable log: prompt, tools, outputs, approvals</div></div>
+</div>
+</div>
+
+<div class="tier t5">
+<div class="tier-label">Foundation Layer</div>
+<h3>⚙️ LLM & Infrastructure</h3>
+<div class="tier-grid">
+<div class="block"><div class="b-title">🧠 LLM Gateway</div><div class="b-desc">GPT-4o / Claude / Gemini with model routing</div></div>
+<div class="block"><div class="b-title">📚 Vector Store</div><div class="b-desc">Embedding index for policy docs and entity search</div></div>
+<div class="block"><div class="b-title">⚡ Inference Cache</div><div class="b-desc">Redis cache for frequent queries and embeddings</div></div>
+<div class="block"><div class="b-title">📊 Usage Metrics</div><div class="b-desc">Token tracking, cost allocation, latency monitoring</div></div>
+</div>
+</div>
+</div>
+
+<!-- Agent Flow -->
+<div class="flow-section">
+<h3>🔄 Agent Execution Flow (CSR Allocation Example)</h3>
+<div class="flow-steps">
+<div class="step"><div class="s-num">1</div><div class="s-icon">💬</div><div class="s-title">User Query</div><div class="s-desc">Arabic: "كيف أوزع 10,000 ريال؟"</div></div>
+<div class="step-arrow">→</div>
+<div class="step"><div class="s-num">2</div><div class="s-icon">🔐</div><div class="s-title">Auth Check</div><div class="s-desc">Verify role + entitlements</div></div>
+<div class="step-arrow">→</div>
+<div class="step"><div class="s-num">3</div><div class="s-icon">🔀</div><div class="s-title">Route</div><div class="s-desc">Intent → CSR agent</div></div>
+<div class="step-arrow">→</div>
+<div class="step"><div class="s-num">4</div><div class="s-icon">🔧</div><div class="s-title">Tool Calls</div><div class="s-desc">Segments + scoring + capacity</div></div>
+<div class="step-arrow">→</div>
+<div class="step"><div class="s-num">5</div><div class="s-icon">📊</div><div class="s-title">Rank</div><div class="s-desc">Budget-fit options generated</div></div>
+<div class="step-arrow">→</div>
+<div class="step"><div class="s-num">6</div><div class="s-icon">📝</div><div class="s-title">Explain</div><div class="s-desc">Justification + traceability</div></div>
+<div class="step-arrow">→</div>
+<div class="step"><div class="s-num">7</div><div class="s-icon">✅</div><div class="s-title">Approve</div><div class="s-desc">Human review before action</div></div>
+</div>
+</div>
+
+<!-- Agents table -->
+<div class="agents-table">
+<h3>🤖 Pre-configured Agent Inventory</h3>
+<table>
+<tr><th>Agent</th><th>Scope</th><th>Tools Used</th><th>Approval</th></tr>
+<tr><td>Eligibility Agent</td><td>Lookup person/household eligibility</td><td>Rules Engine, Registry</td><td><span class="a-tag a-auto">Auto</span></td></tr>
+<tr><td>Segment Explorer</td><td>Query and compare population segments</td><td>Segment Builder, Analytics</td><td><span class="a-tag a-auto">Auto</span></td></tr>
+<tr><td>CSR Allocator</td><td>Budget-constrained fund allocation</td><td>Scoring, Capacity, Segments</td><td><span class="a-tag a-hitl">Human Review</span></td></tr>
+<tr><td>Coverage Analyst</td><td>Gap analysis and regional distribution</td><td>Analytics, Geography</td><td><span class="a-tag a-auto">Auto</span></td></tr>
+<tr><td>Hospital Support</td><td>Institutional capacity and need analysis</td><td>Institution Query, Scoring</td><td><span class="a-tag a-hitl">Human Review</span></td></tr>
+<tr><td>Policy Advisor</td><td>Regulation and policy Q&A</td><td>Policy RAG, Document Search</td><td><span class="a-tag a-auto">Auto</span></td></tr>
+</table>
+</div>
+</div>
+</body>
+</html>

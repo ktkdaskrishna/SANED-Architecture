@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PASI — Security Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--card:#131a2e;--border:rgba(255,255,255,.06);--text:#f1f5f9;--muted:#64748b;--teal:#2dd4bf;--blue:#3b82f6;--violet:#818cf8;--amber:#f59e0b;--emerald:#10b981;--cyan:#06b6d4;--orange:#f97316;--rose:#f43f5e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:48px 48px}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:40px 24px}
+.hdr{text-align:center;margin-bottom:44px}
+.hdr .tag{display:inline-block;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);border-radius:100px;padding:5px 14px;font-size:11px;font-weight:600;color:var(--rose);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.hdr h1{font-size:30px;font-weight:800}
+.hdr p{color:var(--muted);font-size:14px;margin-top:6px}
+
+.domains{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.domain{border-radius:14px;border:1px solid;padding:20px;position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s}
+.domain:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.domain .d-icon{font-size:28px;margin-bottom:8px}
+.domain h3{font-size:15px;font-weight:700;margin-bottom:10px}
+.domain ul{list-style:none}
+.domain li{font-size:12px;color:var(--muted);padding:4px 0;display:flex;align-items:flex-start;gap:6px}
+.domain li .check{color:var(--emerald);font-size:12px;flex-shrink:0}
+
+.d1{border-color:rgba(59,130,246,.2);background:linear-gradient(180deg,rgba(59,130,246,.05) 0%,var(--card) 100%)}
+.d1 h3{color:var(--blue)}
+.d2{border-color:rgba(245,158,11,.2);background:linear-gradient(180deg,rgba(245,158,11,.05) 0%,var(--card) 100%)}
+.d2 h3{color:var(--amber)}
+.d3{border-color:rgba(129,140,248,.2);background:linear-gradient(180deg,rgba(129,140,248,.05) 0%,var(--card) 100%)}
+.d3 h3{color:var(--violet)}
+.d4{border-color:rgba(244,63,94,.2);background:linear-gradient(180deg,rgba(244,63,94,.05) 0%,var(--card) 100%)}
+.d4 h3{color:var(--rose)}
+.d5{border-color:rgba(16,185,129,.2);background:linear-gradient(180deg,rgba(16,185,129,.05) 0%,var(--card) 100%)}
+.d5 h3{color:var(--emerald)}
+.d6{border-color:rgba(6,182,212,.2);background:linear-gradient(180deg,rgba(6,182,212,.05) 0%,var(--card) 100%)}
+.d6 h3{color:var(--cyan)}
+
+/* Compliance table */
+.compliance{margin-top:24px;padding:20px;border-radius:14px;border:1px solid var(--border);background:var(--card)}
+.compliance h3{font-size:14px;font-weight:700;margin-bottom:12px}
+.compliance table{width:100%;border-collapse:collapse;font-size:12px}
+.compliance th{text-align:left;padding:8px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;font-size:10px}
+.compliance td{padding:8px;border-bottom:1px solid rgba(255,255,255,.02)}
+.compliance td:first-child{font-weight:600}
+.c-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.c-yes{background:rgba(16,185,129,.1);color:var(--emerald)}
+.c-partial{background:rgba(245,158,11,.1);color:var(--amber)}
+
+@media(max-width:768px){.domains{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="wrap">
+<div class="hdr">
+<div class="tag">Security Architecture</div>
+<h1>Security & Governance Framework</h1>
+<p>Defense-in-depth controls across identity, encryption, data protection, AI safety, audit, and compliance</p>
+</div>
+
+<div class="domains">
+<div class="domain d1">
+<div class="d-icon">🔐</div>
+<h3>Identity & Access Management</h3>
+<ul>
+<li><span class="check">✓</span> Centralized IAM with SSO federation</li>
+<li><span class="check">✓</span> MFA enforced for all human actors</li>
+<li><span class="check">✓</span> RBAC for standard operations + ABAC for data-scoped access</li>
+<li><span class="check">✓</span> Service identities for pipelines, agents, integrations</li>
+<li><span class="check">✓</span> JIT elevated privileges for admin actions</li>
+<li><span class="check">✓</span> Quarterly access reviews with auto-revocation</li>
+</ul>
+</div>
+
+<div class="domain d2">
+<div class="d-icon">🔑</div>
+<h3>Encryption & Key Management</h3>
+<ul>
+<li><span class="check">✓</span> TLS 1.3 in transit across all paths</li>
+<li><span class="check">✓</span> AES-256 at rest — all storage tiers</li>
+<li><span class="check">✓</span> Organization-managed keys (CMK) for critical stores</li>
+<li><span class="check">✓</span> Separate key domains: raw, curated, secrets, models</li>
+<li><span class="check">✓</span> Automated key rotation per policy</li>
+<li><span class="check">✓</span> All key usage and admin changes logged</li>
+</ul>
+</div>
+
+<div class="domain d3">
+<div class="d-icon">🎭</div>
+<h3>Data Protection & Privacy</h3>
+<ul>
+<li><span class="check">✓</span> National ID tokenization in lower-trust contexts</li>
+<li><span class="check">✓</span> Column-level masking for sensitive attributes</li>
+<li><span class="check">✓</span> Row-level security by role, geography, program</li>
+<li><span class="check">✓</span> Data classification: Public, Internal, Confidential, Restricted</li>
+<li><span class="check">✓</span> Consent and sharing constraints enforcement</li>
+<li><span class="check">✓</span> Data residency: all data within Oman jurisdiction</li>
+</ul>
+</div>
+
+<div class="domain d4">
+<div class="d-icon">🛡️</div>
+<h3>AI Safety & Guardrails</h3>
+<ul>
+<li><span class="check">✓</span> No unrestricted model access to raw PII</li>
+<li><span class="check">✓</span> Tool-use restricted to approved governed connectors</li>
+<li><span class="check">✓</span> Prompt injection and jailbreak detection</li>
+<li><span class="check">✓</span> PII masking in prompts and responses</li>
+<li><span class="check">✓</span> Complete prompt/tool/output audit trail</li>
+<li><span class="check">✓</span> Human approval for high-impact AI outputs</li>
+</ul>
+</div>
+
+<div class="domain d5">
+<div class="d-icon">📜</div>
+<h3>Audit & Observability</h3>
+<ul>
+<li><span class="check">✓</span> Immutable audit logs for all material actions</li>
+<li><span class="check">✓</span> Actor, timestamp, justification, outcome for each event</li>
+<li><span class="check">✓</span> Pipeline health monitoring (Prometheus + Grafana)</li>
+<li><span class="check">✓</span> Security events forwarded to SIEM/SOC</li>
+<li><span class="check">✓</span> Anomaly detection on access patterns</li>
+<li><span class="check">✓</span> SLA compliance dashboards</li>
+</ul>
+</div>
+
+<div class="domain d6">
+<div class="d-icon">⚖️</div>
+<h3>Compliance & Governance</h3>
+<ul>
+<li><span class="check">✓</span> Data retention policies per classification</li>
+<li><span class="check">✓</span> Segregation of duties enforcement</li>
+<li><span class="check">✓</span> Data lineage and provenance tracking</li>
+<li><span class="check">✓</span> Model governance: approval gate before production</li>
+<li><span class="check">✓</span> Schema change approval workflows</li>
+<li><span class="check">✓</span> Regular compliance audits and reporting</li>
+</ul>
+</div>
+</div>
+
+<!-- Compliance mapping -->
+<div class="compliance">
+<h3>📋 Compliance Framework Mapping</h3>
+<table>
+<tr><th>Requirement</th><th>Controls Applied</th><th>Status</th></tr>
+<tr><td>Data Residency (Oman)</td><td>All compute and storage within Oman region</td><td><span class="c-tag c-yes">Addressed</span></td></tr>
+<tr><td>PII Protection</td><td>Masking, tokenization, row/column security, classification</td><td><span class="c-tag c-yes">Addressed</span></td></tr>
+<tr><td>Access Control</td><td>SSO + MFA + RBAC/ABAC + JIT + quarterly reviews</td><td><span class="c-tag c-yes">Addressed</span></td></tr>
+<tr><td>Encryption</td><td>TLS 1.3 transit + AES-256 rest + CMK + domain separation</td><td><span class="c-tag c-yes">Addressed</span></td></tr>
+<tr><td>Audit Trail</td><td>Immutable logs, actor/timestamp, SIEM integration</td><td><span class="c-tag c-yes">Addressed</span></td></tr>
+<tr><td>AI Governance</td><td>Guardrails, approval gates, prompt audit, PII shield</td><td><span class="c-tag c-yes">Addressed</span></td></tr>
+<tr><td>Model Explainability</td><td>SHAP values, feature importance, decision traceability</td><td><span class="c-tag c-yes">Addressed</span></td></tr>
+<tr><td>Data Quality</td><td>Quarantine flows, stewardship workflows, source SLAs</td><td><span class="c-tag c-yes">Addressed</span></td></tr>
+</table>
+</div>
+</div>
+</body>
+</html>
